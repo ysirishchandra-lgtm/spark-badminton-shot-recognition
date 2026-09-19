@@ -38,7 +38,7 @@ export default function ResultsDisplay({
           <h3 className="text-base font-bold text-[var(--text-primary)] tracking-wide flex items-center space-x-2">
             <span>Recognition & Analysis Results</span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] font-mono border border-[var(--border-subtle)]">
-              EXP23_C Model
+              Deep Temporal Model
             </span>
           </h3>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
@@ -260,7 +260,7 @@ export default function ResultsDisplay({
           </svg>
         </div>
         <div className="text-xs text-[var(--text-secondary)] leading-relaxed">
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400">AI Inference Pipeline:</span> Video frames are sampled across the clip duration, normalized using ImageNet parameters, processed through frozen ResNet-18 spatial pooling (512-D), and classified by the EXP23_C Transformer+LSTM temporal network into the 5 standard badminton shot categories.
+          <span className="font-semibold text-emerald-600 dark:text-emerald-400">AI Inference Pipeline:</span> Video frames are sampled across the clip duration, normalized using ImageNet parameters, processed through frozen ResNet-18 spatial pooling (512-D), and classified by the Transformer-LSTM temporal sequence network into the 5 standard badminton shot categories.
         </div>
       </div>
     </div>

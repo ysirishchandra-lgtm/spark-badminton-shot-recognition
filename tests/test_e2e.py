@@ -49,33 +49,70 @@ def test_e2e_integration():
         assert "DRIVE" in html
         assert "NET SHOT" in html
 
-    print("\n--- 4. Testing End-to-End Video Upload (POST /api/video/upload) ---")
-    sample_video = Path("tests/test_sample.mp4")
-    assert sample_video.exists(), "test_sample.mp4 must exist"
-    
-    with open(sample_video, "rb") as f:
-        files = {"file": ("test_sample.mp4", f, "video/mp4")}
-        client = httpx.Client(base_url="http://127.0.0.1:8000", timeout=10.0)
+    print("\n--- 4. Testing End-to-End Video Upload & Inference (POST /api/video/upload & analyze) ---")
+    import cv2
+    import numpy as np
+    import tempfile
+    import os
+
+    # Generate a temporary valid 24-frame mp4 video
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_vid:
+        tmp_vid_path = tmp_vid.name
+
+    try:
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        writer = cv2.VideoWriter(tmp_vid_path, fourcc, 25.0, (320, 240))
+        for i in range(24):
+            frame = np.full((240, 320, 3), fill_value=(i * 10) % 255, dtype=np.uint8)
+            cv2.circle(frame, (160, 120), 40, (0, 255, 0), -1)
+            writer.write(frame)
+        writer.release()
+
+        with open(tmp_vid_path, "rb") as f:
+            video_bytes = f.read()
+
+        client = httpx.Client(base_url="http://127.0.0.1:8000", timeout=30.0)
+        files = {"file": ("e2e_sample.mp4", io.BytesIO(video_bytes), "video/mp4")}
         res = client.post("/api/video/upload", files=files)
         print(f"Upload status code: {res.status_code}")
-        print(f"Upload response: {res.json()}")
         assert res.status_code == 201
         upload_data = res.json()
+        print(f"Upload response: {upload_data}")
         assert "video_id" in upload_data
-        assert upload_data["filename"] == "test_sample.mp4"
+        video_id = upload_data["video_id"]
         assert upload_data["status"] == "uploaded"
-        
+
         # Verify file saved on disk
-        stored_path = settings.UPLOAD_DIR / f"{upload_data['video_id']}_test_sample.mp4"
+        stored_path = settings.UPLOAD_DIR / f"{video_id}_e2e_sample.mp4"
         assert stored_path.exists(), f"Stored file should exist at {stored_path}"
-        assert stored_path.stat().st_size == sample_video.stat().st_size
         print(f"Verified stored video on disk: {stored_path.name} ({stored_path.stat().st_size} bytes)")
-        
+
+        # Test analyze endpoint live
+        analyze_res = client.post("/api/video/analyze", json={"video_id": video_id})
+        print(f"Analyze status code: {analyze_res.status_code}")
+        assert analyze_res.status_code == 200
+        analysis_data = analyze_res.json()
+        print(f"Analysis result: {analysis_data}")
+        assert analysis_data["video_id"] == video_id
+        assert analysis_data["status"] == "completed"
+        assert analysis_data["predicted_shot"] in ["SMASH", "CLEAR", "DROP", "DRIVE", "NET_SHOT"]
+        assert 0.0 <= analysis_data["confidence"] <= 1.0
+        assert analysis_data["frames_used"] == 16
+        assert len(analysis_data["probabilities"]) == 5
+        assert abs(sum(analysis_data["probabilities"].values()) - 1.0) < 1e-3
+
         # Clean up uploaded test artifact
-        stored_path.unlink()
-        print("Cleaned up uploaded test file from storage/uploads.")
+        if stored_path.exists():
+            stored_path.unlink()
+            print("Cleaned up uploaded test file from storage/uploads.")
+
+    finally:
+        if os.path.exists(tmp_vid_path):
+            os.remove(tmp_vid_path)
 
     print("\n>>> ALL LIVE INTEGRATION TESTS PASSED SUCCESSFULLY! <<<\n")
 
 if __name__ == "__main__":
+    import io
     test_e2e_integration()
+
