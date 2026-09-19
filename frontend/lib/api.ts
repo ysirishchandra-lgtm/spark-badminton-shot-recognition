@@ -3,7 +3,7 @@
  * Communicates with FastAPI backend using configurable NEXT_PUBLIC_API_URL.
  */
 
-import { VideoUploadResponse, BackendHealthResponse } from '@/types';
+import { VideoUploadResponse, BackendHealthResponse, VideoAnalysisResponse } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -64,6 +64,42 @@ export async function uploadVideoFile(file: File): Promise<VideoUploadResponse> 
     return await response.json();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Network error during upload';
+    throw new Error(message);
+  }
+}
+
+/**
+ * Sends a video_id to POST /api/video/analyze to run inference.
+ */
+export async function analyzeVideo(videoId: string): Promise<VideoAnalysisResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/video/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ video_id: videoId }),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Video analysis failed with status code ${response.status}`;
+      try {
+        const errorJson = await response.json();
+        if (errorJson?.detail) {
+          errorMessage = typeof errorJson.detail === 'string'
+            ? errorJson.detail
+            : JSON.stringify(errorJson.detail);
+        }
+      } catch {
+        // Fallback to default message
+      }
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unable to connect to the SPARK analysis server';
     throw new Error(message);
   }
 }

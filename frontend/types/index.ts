@@ -16,13 +16,31 @@ export interface BackendHealthResponse {
   service: string;
 }
 
-export interface AnalysisPlaceholderState {
-  videoId: string | null;
-  predictedShot: string | null;
-  confidence: number | null;
-  processingTimeSec: number | null;
-  status: 'idle' | 'uploaded' | 'pending_ml_integration' | 'error';
+export interface VideoAnalysisResponse {
+  video_id: string;
+  status: string;
+  predicted_shot: string;
+  confidence: number;
+  probabilities: {
+    SMASH: number;
+    CLEAR: number;
+    DROP: number;
+    DRIVE: number;
+    NET_SHOT: number;
+  };
+  frames_used: number;
+  processing_time_ms: number;
+  message: string;
 }
+
+export type AnalysisStatus = 
+  | 'idle'
+  | 'selected'
+  | 'uploading'
+  | 'uploaded'
+  | 'analyzing'
+  | 'completed'
+  | 'error';
 
 export type ShotClass = 'SMASH' | 'CLEAR' | 'DROP' | 'DRIVE' | 'NET SHOT';
 

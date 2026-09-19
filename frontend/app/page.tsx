@@ -5,26 +5,60 @@ import ShotClassBadges from '@/components/ShotClassBadges';
 import VideoUploader from '@/components/VideoUploader';
 import VideoPreview from '@/components/VideoPreview';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import { VideoUploadResponse } from '@/types';
+import { VideoUploadResponse, VideoAnalysisResponse, AnalysisStatus } from '@/types';
+import { analyzeVideo } from '@/lib/api';
 
 export default function HomePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadResult, setUploadResult] = useState<VideoUploadResponse | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<VideoAnalysisResponse | null>(null);
+  const [status, setStatus] = useState<AnalysisStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleFileSelected = (file: File | null) => {
     setSelectedFile(file);
-    if (file === null) {
-      setUploadResult(null);
-    }
+    setUploadResult(null);
+    setAnalysisResult(null);
+    setErrorMessage(null);
+    setStatus(file ? 'selected' : 'idle');
   };
 
   const handleUploadSuccess = (response: VideoUploadResponse) => {
     setUploadResult(response);
+    setStatus('uploaded');
+    setErrorMessage(null);
+  };
+
+  const handleAnalyzeClick = async () => {
+    if (!uploadResult?.video_id) {
+      setErrorMessage('Please upload a video before analyzing.');
+      return;
+    }
+
+    setStatus('analyzing');
+    setErrorMessage(null);
+
+    try {
+      const result = await analyzeVideo(uploadResult.video_id);
+      setAnalysisResult(result);
+      setStatus('completed');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Video analysis failed. Please try again.';
+      setErrorMessage(msg);
+      setStatus('error');
+    }
   };
 
   const handleClearVideo = () => {
     setSelectedFile(null);
     setUploadResult(null);
+    setAnalysisResult(null);
+    setStatus('idle');
+    setErrorMessage(null);
+  };
+
+  const handleDismissError = () => {
+    setErrorMessage(null);
   };
 
   return (
@@ -55,12 +89,17 @@ export default function HomePage() {
 
       {/* Main Upload and Preview Grid */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Upload Component */}
+        {/* Left Column: Upload & Actions */}
         <div className="lg:col-span-5 space-y-6">
           <VideoUploader
             selectedFile={selectedFile}
             onFileSelected={handleFileSelected}
             onUploadSuccess={handleUploadSuccess}
+            onAnalyzeClick={handleAnalyzeClick}
+            status={status}
+            errorMessage={errorMessage}
+            onDismissError={handleDismissError}
+            videoId={uploadResult?.video_id || null}
           />
         </div>
 
@@ -92,7 +131,9 @@ export default function HomePage() {
         <ResultsDisplay
           videoId={uploadResult?.video_id || null}
           uploadedFilename={uploadResult?.filename || null}
-          isUploaded={uploadResult !== null}
+          status={status}
+          analysisResult={analysisResult}
+          errorMessage={errorMessage}
         />
       </section>
     </div>
