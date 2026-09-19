@@ -76,7 +76,7 @@ export default function VideoUploader({
 
     try {
       const result = await uploadVideoFile(selectedFile);
-      setUploadStatus('Upload complete! Video safely registered.');
+      setUploadStatus('Video uploaded successfully.');
       onUploadSuccess(result);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Upload failed';
@@ -88,12 +88,12 @@ export default function VideoUploader({
   };
 
   return (
-    <div className="w-full bg-[#0F172A] border border-white/10 rounded-2xl p-6 shadow-xl">
-      <h3 className="text-base font-bold text-white tracking-wide mb-1 flex items-center space-x-2">
-        <span>Video Upload & Processing</span>
+    <div className="w-full spark-card rounded-2xl p-6">
+      <h3 className="text-base font-bold text-[var(--text-primary)] tracking-wide mb-1 flex items-center space-x-2">
+        <span>Upload Match Video</span>
       </h3>
-      <p className="text-xs text-slate-400 mb-4">
-        Upload a badminton match rally or shot clip. Supported formats: MP4, MOV, AVI, MKV, WEBM.
+      <p className="text-xs text-[var(--text-secondary)] mb-4">
+        Supported: MP4, MOV, AVI, MKV, WEBM • Maximum size: 200 MB
       </p>
 
       {/* Drag & Drop Area */}
@@ -104,10 +104,10 @@ export default function VideoUploader({
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
           isDragging
-            ? 'border-emerald-400 bg-emerald-500/10'
+            ? 'border-emerald-500 bg-emerald-500/10'
             : selectedFile
-            ? 'border-emerald-500/50 bg-emerald-950/10'
-            : 'border-white/10 hover:border-emerald-500/30 hover:bg-white/[0.02]'
+            ? 'border-emerald-500/50 bg-emerald-500/5'
+            : 'border-[var(--border-subtle)] hover:border-emerald-500/40 hover:bg-[var(--bg-secondary)]'
         }`}
       >
         <input
@@ -117,58 +117,59 @@ export default function VideoUploader({
           onChange={handleFileInput}
           className="hidden"
           id="spark-video-file-input"
+          aria-label="Upload match video"
         />
 
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="w-12 h-12 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center text-slate-300">
-            <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-secondary)]">
+            <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">
               {isDragging
                 ? 'Drop the video here'
                 : selectedFile
                 ? 'Click or drop a different video to replace'
-                : 'Drag and drop your badminton video here, or browse'}
+                : 'Drag & drop your video here, or browse files'}
             </p>
-            <p className="text-xs text-slate-400 mt-1 font-mono">
-              Maximum upload size: Configurable (Default: 200MB)
+            <p className="text-xs text-[var(--text-muted)] mt-1 font-mono">
+              MP4, MOV, AVI, MKV, WEBM (up to 200 MB)
             </p>
           </div>
         </div>
       </div>
 
-      {/* Selected File Badge */}
+      {/* Selected File Details */}
       {selectedFile && (
-        <div className="mt-4 p-3 rounded-xl bg-slate-800/80 border border-white/10 flex items-center justify-between">
+        <div className="mt-4 p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center justify-between">
           <div className="flex items-center space-x-2 truncate">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-xs font-mono text-slate-200 truncate">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+            <span className="text-xs font-mono text-[var(--text-primary)] truncate">
               {selectedFile.name}
             </span>
-            <span className="text-xs text-emerald-400 font-mono">
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-mono flex-shrink-0">
               ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
             </span>
           </div>
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-mono">
-            Ready
+          <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-mono flex-shrink-0 ml-2">
+            Selected
           </span>
         </div>
       )}
 
-      {/* Upload & Analyze Action Button */}
+      {/* Analyze Button */}
       <div className="mt-5 flex items-center space-x-4">
         <button
           id="spark-analyze-video-btn"
           onClick={handleUploadAndAnalyze}
           disabled={!selectedFile || isUploading}
-          className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg ${
+          className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm ${
             !selectedFile || isUploading
-              ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
-              : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20 border border-emerald-400/30'
+              ? 'bg-[var(--bg-secondary)] text-[var(--text-muted)] cursor-not-allowed border border-[var(--border-subtle)]'
+              : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20 border border-emerald-500/30'
           }`}
         >
           {isUploading ? (
@@ -177,7 +178,7 @@ export default function VideoUploader({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
               </svg>
-              <span>Uploading & Processing...</span>
+              <span>Uploading Video...</span>
             </>
           ) : (
             <>
@@ -191,27 +192,29 @@ export default function VideoUploader({
         </button>
       </div>
 
-      {/* Status & Alerts */}
+      {/* Status Alert */}
       {uploadStatus && (
-        <div className="mt-4 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center space-x-2 text-xs text-emerald-300">
-          <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center space-x-2 text-xs text-emerald-700 dark:text-emerald-300">
+          <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
           <span className="font-mono">{uploadStatus}</span>
         </div>
       )}
 
+      {/* Error Alert */}
       {errorMessage && (
-        <div className="mt-4 p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-center justify-between text-xs text-rose-300">
+        <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between text-xs text-rose-700 dark:text-rose-300">
           <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="font-mono">{errorMessage}</span>
           </div>
           <button
             onClick={() => setErrorMessage(null)}
-            className="text-slate-400 hover:text-white ml-2 text-xs"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-2 text-xs"
+            aria-label="Dismiss error"
           >
             ✕
           </button>

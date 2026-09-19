@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { checkBackendHealth } from '@/lib/api';
 import { BackendHealthResponse } from '@/types';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   const [health, setHealth] = useState<BackendHealthResponse | null>(null);
@@ -30,14 +31,14 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="w-full border-b border-white/10 bg-[#0B1120]/80 backdrop-blur-md sticky top-0 z-50">
+    <header className="w-full border-b border-[var(--header-border)] bg-[var(--header-bg)] backdrop-blur-md sticky top-0 z-50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-500/20 flex-shrink-0">
             {/* Badminton Shuttlecock / Spark Icon SVG */}
             <svg
-              className="w-6 h-6 text-white"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -52,46 +53,55 @@ export default function Header() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xl font-bold tracking-wider text-white">SPARK</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                v1.0 Day 18
+              <span className="text-lg sm:text-xl font-bold tracking-wider text-[var(--text-primary)]">
+                SPARK
+              </span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
+                AI Vision
               </span>
             </div>
-            <p className="text-xs text-slate-400 hidden sm:block">
-              Badminton Shot Recognition System
+            <p className="text-xs text-[var(--text-secondary)] hidden sm:block">
+              AI-Powered Badminton Shot Recognition
             </p>
           </div>
         </div>
 
-        {/* Backend Connectivity Status Pill */}
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-white/10 text-xs">
+        {/* Action Controls: Backend Status Pill, Theme Switcher, GitHub Link */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Backend Status Indicator */}
+          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs font-mono">
             <span
               className={`w-2 h-2 rounded-full ${
                 checking
                   ? 'bg-amber-400 animate-pulse'
                   : health
-                  ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
-                  : 'bg-rose-400'
+                  ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]'
+                  : 'bg-rose-500'
               }`}
             />
-            <span className="text-slate-300 font-mono">
-              Backend:{' '}
-              {checking ? (
-                <span className="text-amber-400">Connecting...</span>
-              ) : health ? (
-                <span className="text-emerald-400 font-semibold">Online (FastAPI)</span>
-              ) : (
-                <span className="text-rose-400 font-semibold">Offline</span>
-              )}
+            <span className="text-[var(--text-secondary)] font-semibold hidden xs:inline">
+              Backend:
             </span>
+            {checking ? (
+              <span className="text-amber-500 dark:text-amber-400 font-medium">Connecting...</span>
+            ) : health ? (
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Online</span>
+            ) : (
+              <span className="text-rose-600 dark:text-rose-400 font-semibold">Offline</span>
+            )}
           </div>
+
+          {/* Theme Switcher Toggle */}
+          <ThemeToggle />
+
+          {/* GitHub Link */}
           <a
             href="https://github.com/ysirishchandra-lgtm/spark-badminton-shot-recognition"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-2 rounded-xl hover:bg-[var(--bg-secondary)] border border-transparent hover:border-[var(--border-subtle)]"
             title="GitHub Repository"
+            aria-label="GitHub Repository"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path
