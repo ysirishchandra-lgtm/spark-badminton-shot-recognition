@@ -1,7 +1,7 @@
-"""Pydantic schemas for video operations and responses."""
+"""Pydantic schemas for video operations, analysis requests, and responses."""
 
+from typing import Optional, Dict
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class VideoUploadResponse(BaseModel):
@@ -23,4 +23,19 @@ class VideoAnalysisPlaceholder(BaseModel):
     predicted_shot: Optional[str] = Field(None, description="Predicted class placeholder ('—')")
     confidence: Optional[float] = Field(None, description="Confidence placeholder ('—')")
     processing_time: Optional[float] = Field(None, description="Processing time placeholder ('—')")
-    status: str = Field("pending_ml_integration", description="Inference integration scheduled for Day 19")
+    status: str = Field("pending_ml_integration", description="Inference integration status")
+
+
+class VideoAnalysisRequest(BaseModel):
+    video_id: str = Field(..., description="Unique identifier of previously uploaded video file")
+
+
+class VideoAnalysisResponse(BaseModel):
+    video_id: str = Field(..., description="Unique identifier of analyzed video")
+    status: str = Field("completed", description="Status of inference ('completed' or 'error')")
+    predicted_shot: str = Field(..., description="Predicted badminton shot category")
+    confidence: float = Field(..., description="Confidence probability of predicted shot (0.0 to 1.0)")
+    probabilities: Dict[str, float] = Field(..., description="Softmax probabilities for all 5 shot categories")
+    frames_used: int = Field(16, description="Number of chronological frames sampled for inference")
+    processing_time_ms: float = Field(..., description="Total pipeline execution latency in milliseconds")
+    message: str = Field("Video analysis completed successfully.", description="Informational message")

@@ -1,32 +1,222 @@
 """
-SPARK Model Inference Service Boundary.
+SPARK Model Inference Service.
 
-Day 18 scope: Interface definition and architecture boundary.
-NOTE: This service does NOT execute inference or return fabricated predictions today.
-The verified EXP24 multimodal transformer-BiLSTM model checkpoint will be integrated
-through this exact boundary during Day 19.
+End-to-end inference pipeline connecting raw badminton video to the verified EXP23_C visual-only model:
+  raw video
+  → frame extraction (OpenCV)
+  → uniform temporal sampling (16 chronological frames)
+  → ImageNet normalization (224x224, RGB)
+  → frozen ResNet-18 spatial backbone (512-D per frame)
+  → visual feature tensor [1, 16, 512]
+  → BadmintonTransformerLSTMClassifier (EXP23_C checkpoint)
+  → 5-class logits [1, 5]
+  → softmax probabilities
+  → structured API prediction response
 """
 
+import os
+import sys
+import time
+import logging
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
+import cv2
+import numpy as np
+import torch
+import torch.nn as nn
+import torchvision.models as models
+
+logger = logging.getLogger("spark.inference")
+
+# External verified paths (outside git repository)
+RESEARCH_MODEL_DIR = r"D:\PS_DATA\PHASE_23_COMBINED_AUGMENTATION\02_TRAINING"
+CHECKPOINT_PATH = r"D:\PS_DATA\PHASE_23_COMBINED_AUGMENTATION\03_CHECKPOINTS\EXP_23_C_best_model.pt"
+RESNET_WEIGHTS_PATH = r"C:\Users\user\.cache\torch\hub\checkpoints\resnet18-f37072fd.pth"
+
+CLASS_NAMES = ["SMASH", "CLEAR", "DROP", "DRIVE", "NET_SHOT"]
+NUM_SAMPLED_FRAMES = 16
+FRAME_SIZE = (224, 224)
+
+# Canonical ImageNet normalization constants verified in research
+IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(1, 1, 3)
+IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(1, 1, 3)
 
 
-def analyze_video(video_path: str) -> Dict[str, Any]:
+def extract_sampled_frames(video_path: str, num_frames: int = NUM_SAMPLED_FRAMES) -> torch.Tensor:
     """
-    Placeholder boundary interface for badminton shot recognition inference.
+    Decodes raw video and extracts exactly `num_frames` uniformly spaced chronological frames.
     
-    Args:
-        video_path: Path to the validated video file on disk.
+    Preprocessing contract:
+    - BGR to RGB
+    - Resize directly to 224x224 via bilinear interpolation (INTER_LINEAR)
+    - uint8 / 255.0 -> float32
+    - ImageNet normalization: (x - mean) / std
+    - HWC -> CHW
+    
+    Returns:
+        torch.Tensor of shape [num_frames, 3, 224, 224] on CPU.
         
     Raises:
-        NotImplementedError: Real ML model integration is scheduled for Day 19.
+        FileNotFoundError: If the video file does not exist on disk.
+        ValueError: If the video cannot be opened or contains fewer than `num_frames` decodable frames.
     """
     path = Path(video_path)
     if not path.exists():
         raise FileNotFoundError(f"Video file not found at {video_path}")
+
+    cap = cv2.VideoCapture(str(path))
+    if not cap.isOpened():
+        raise ValueError(f"The video file could not be opened or decoded: {path.name}")
+
+    frames_bgr = []
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret or frame is None:
+                break
+            frames_bgr.append(frame)
+    finally:
+        cap.release()
+
+    total_frames = len(frames_bgr)
+    if total_frames < num_frames:
+        raise ValueError(
+            f"Video contains only {total_frames} decodable frames. "
+            f"A minimum of {num_frames} frames is required for shot recognition analysis."
+        )
+
+    # Uniform temporal sampling spanning the video duration
+    indices = np.linspace(0, total_frames - 1, num_frames, dtype=int)
+    sampled_frames = [frames_bgr[idx] for idx in indices]
+
+    preproc_list = []
+    for frame in sampled_frames:
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        resized = cv2.resize(rgb, FRAME_SIZE, interpolation=cv2.INTER_LINEAR)
+        norm = (resized.astype(np.float32) / 255.0 - IMAGENET_MEAN) / IMAGENET_STD
+        chw = np.transpose(norm, (2, 0, 1))
+        preproc_list.append(chw)
+
+    tensor_stack = torch.tensor(np.stack(preproc_list), dtype=torch.float32)
+    return tensor_stack
+
+
+class InferenceManager:
+    """
+    Singleton manager for loading, caching, and running the ResNet-18 + EXP23_C model pipeline.
+    """
+    _instance: Optional["InferenceManager"] = None
+
+    def __init__(self):
+        self.resnet: Optional[nn.Module] = None
+        self.temporal_model: Optional[nn.Module] = None
+        self._is_loaded: bool = False
+
+    @classmethod
+    def get_instance(cls) -> "InferenceManager":
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def load_models(self) -> None:
+        """Loads both ResNet-18 and BadmintonTransformerLSTMClassifier into memory (CPU)."""
+        if self._is_loaded:
+            return
+
+        logger.info("Initializing SPARK inference pipeline models...")
+        t0 = time.perf_counter()
+
+        # 1. Load ResNet-18 spatial feature extractor
+        if not os.path.exists(RESNET_WEIGHTS_PATH):
+            raise FileNotFoundError(f"ResNet-18 weights not found at {RESNET_WEIGHTS_PATH}")
+
+        resnet = models.resnet18(weights=None)
+        state_dict = torch.load(RESNET_WEIGHTS_PATH, map_location="cpu", weights_only=False)
+        resnet.load_state_dict(state_dict)
+        resnet.fc = nn.Identity()  # Truncate at penultimate 512-D pooling layer
+        resnet.eval()
+        for param in resnet.parameters():
+            param.requires_grad = False
+        self.resnet = resnet
+
+        # 2. Load BadmintonTransformerLSTMClassifier temporal model
+        if not os.path.exists(RESEARCH_MODEL_DIR):
+            raise FileNotFoundError(f"Research models directory not found at {RESEARCH_MODEL_DIR}")
+        if not os.path.exists(CHECKPOINT_PATH):
+            raise FileNotFoundError(f"EXP23_C checkpoint not found at {CHECKPOINT_PATH}")
+
+        if RESEARCH_MODEL_DIR not in sys.path:
+            sys.path.insert(0, RESEARCH_MODEL_DIR)
+
+        from models import BadmintonTransformerLSTMClassifier
+
+        temporal_model = BadmintonTransformerLSTMClassifier()
+        ckpt = torch.load(CHECKPOINT_PATH, map_location="cpu", weights_only=False)
+        temporal_model.load_state_dict(ckpt["model_state_dict"])
+        temporal_model.eval()
+        for param in temporal_model.parameters():
+            param.requires_grad = False
+        self.temporal_model = temporal_model
+
+        self._is_loaded = True
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+        logger.info(f"SPARK models loaded successfully in {elapsed_ms:.1f} ms.")
+
+    def analyze_video(self, video_path: str) -> Dict[str, Any]:
+        """
+        Executes full inference on an uploaded video.
         
-    raise NotImplementedError(
-        "Day 18 Scope: Application Foundation. Full EXP24 multimodal inference "
-        "pipeline will be connected to this service boundary on Day 19. "
-        "No fabricated predictions are permitted."
-    )
+        Returns:
+            Dict containing predicted_shot, confidence, probabilities, frames_used, processing_time_ms.
+        """
+        t_start = time.perf_counter()
+
+        # Ensure models are loaded
+        if not self._is_loaded:
+            self.load_models()
+
+        # Step 1: Decode and sample frames
+        frames_tensor = extract_sampled_frames(video_path, num_frames=NUM_SAMPLED_FRAMES)  # [16, 3, 224, 224]
+
+        # Step 2: Extract spatial features via frozen ResNet-18
+        with torch.no_grad():
+            visual_features = self.resnet(frames_tensor)  # [16, 512]
+            feature_sequence = visual_features.unsqueeze(0)  # [1, 16, 512]
+
+            # Step 3: Forward pass through EXP23_C temporal model
+            logits = self.temporal_model(feature_sequence)  # [1, 5]
+            probabilities = torch.softmax(logits, dim=1)[0]  # [5]
+
+        # Step 4: Map predictions and format output
+        probs_list = probabilities.numpy().tolist()
+        pred_idx = int(torch.argmax(probabilities).item())
+        pred_class = CLASS_NAMES[pred_idx]
+        confidence = float(probs_list[pred_idx])
+
+        probabilities_dict = {
+            cls_name: round(float(probs_list[i]), 4)
+            for i, cls_name in enumerate(CLASS_NAMES)
+        }
+
+        total_latency_ms = (time.perf_counter() - t_start) * 1000
+
+        return {
+            "status": "completed",
+            "predicted_shot": pred_class,
+            "confidence": round(confidence, 4),
+            "probabilities": probabilities_dict,
+            "frames_used": NUM_SAMPLED_FRAMES,
+            "processing_time_ms": round(total_latency_ms, 2),
+            "message": "Video analysis completed successfully."
+        }
+
+
+def get_inference_manager() -> InferenceManager:
+    """Returns the singleton InferenceManager instance."""
+    return InferenceManager.get_instance()
+
+
+def analyze_video(video_path: str) -> Dict[str, Any]:
+    """Convenience entry point for video analysis."""
+    manager = get_inference_manager()
+    return manager.analyze_video(video_path)
