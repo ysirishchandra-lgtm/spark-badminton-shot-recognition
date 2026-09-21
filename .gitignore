@@ -25,6 +25,7 @@ htmlcov/
 
 # Video Files & Large Media (Do NOT commit raw/uploaded videos)
 *.mp4
+cloudflared.exe
 *.mov
 *.avi
 *.mkv
