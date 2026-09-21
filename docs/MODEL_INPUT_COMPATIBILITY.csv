@@ -1,0 +1,4 @@
+experiment,input_source,visual_input_dim,aux_input_dim,aux_features,raw_video_capable,missing_features_for_raw_video,production_compatible
+EXP_DRIVE_08B,ResNet-18+HV_flow_from_video,[1x16x512],28D,27D_spatial_coords+1D_HV_flow_ratio,PARTIAL,27D_spatial (hit_xy player_xy opp_xy area_onehot is_overhead is_aroundhead is_backhand d_reach d_opp) all require annotations,NO - spatial coords unavailable without annotation pipeline
+EXP_DRIVE_11,Frozen_EXP08B_logits+EXP10_m_scalar,[1x5 precomputed],1D_scalar,normalized_early_horizontal_motion_rate,PARTIAL,Requires EXP08B base logits (which require 28D input) AND optical-flow scalar m - m alone is computable from video but base logits require annotation pipeline,NO - cannot operate standalone from raw video
+EXP_23_C (PRODUCTION),ResNet-18,[1x16x512],NONE,NONE - pure visual,YES,None,YES - currently deployed in SPARK backend

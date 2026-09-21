@@ -1,0 +1,46 @@
+{
+  "audit_timestamp": "2026-09-21T15:55:00+05:30",
+  "sha256_identity_resolved": true,
+  "sha256_mapping": {
+    "0b296996d8cd7a63a5449a0a6fb21d4e84817be0bed3aeb1b837da4dfc75f164": {
+      "belongs_to": "EXP_DRIVE_08B_best_checkpoint.pt",
+      "path": "D:/PS_DATA/DRIVE_EXPERIMENTS/EXP_DRIVE_08B_HV_MOTION/03_CHECKPOINTS/EXP_DRIVE_08B_best_checkpoint.pt",
+      "size_bytes": 4086490,
+      "validated_by": "precompute_base_logits.py (asserts hash before training EXP11)"
+    },
+    "9ef77e6bdba535a20e330b2e41a502d37ea58fa7a75d2ec0f9af69519fe5924a": {
+      "belongs_to": "EXP_DRIVE_11_best_checkpoint.pt",
+      "path": "D:/PS_DATA/DRIVE_EXPERIMENTS/EXP_DRIVE_11_PROTECTED_DRIVE_GATE/03_CHECKPOINTS/EXP_DRIVE_11_best_checkpoint.pt",
+      "size_bytes": 8593,
+      "architecture": "ProtectedDriveGate_ONLY (27 trainable params, NOT standalone)",
+      "validated_by": "checkpoint_inspect + metric_reproduction task-2303"
+    }
+  },
+  "exp_drive_11_reproducible": true,
+  "reproduction_evidence": {
+    "accuracy": "77.55%",
+    "macro_f1": "69.35%",
+    "weighted_f1": "77.63%",
+    "task_id": "task-2303",
+    "exact_match": true
+  },
+  "deployability_options": {
+    "EXP_DRIVE_08B": "NOT_RAW_VIDEO_DEPLOYABLE",
+    "EXP_DRIVE_11": "NOT_RAW_VIDEO_DEPLOYABLE",
+    "EXP_23_C": "FULLY_RAW_VIDEO_DEPLOYABLE"
+  },
+  "current_production_model": "EXP_23_C_best_model.pt",
+  "current_production_sha256": "cd511db28d5df5d0e400ecce957ce0db79ea57c553d862fdf6c2be0360a31e59",
+  "current_production_accuracy": "66.73%",
+  "current_production_macro_f1": "52.82%",
+  "sha256_confusion_root_cause": "The pre-deployment prompt specified SHA256 0b296996... as the EXP_DRIVE_11 checkpoint. However, 0b296996... is the SHA256 of EXP_DRIVE_08B_best_checkpoint.pt \u2014 the base model that EXP_DRIVE_11 depends on. EXP_DRIVE_11 itself is only a 27-param gate head (8593 bytes) with SHA256 9ef77e6b... The confusion originated from: the pre-deployment audit incorrectly assumed EXP_DRIVE_11_best_checkpoint.pt would embed/include a copy of the EXP08B base model weights. It does not \u2014 it stores only the 27-parameter gate_state_dict.",
+  "deployment_final_verdict": "OPTION D",
+  "verdict_detail": "EXP_DRIVE_11 is a secondary research gate that sits on top of the frozen EXP_DRIVE_08B backbone. Neither EXP_DRIVE_11 nor EXP_DRIVE_08B can be deployed from raw video alone. The correct production model is EXP_23_C \u2014 pure visual, raw-video deployable, already correctly installed in the SPARK backend. No model replacement is needed.",
+  "recommended_next_action": "No checkpoint modification required. No model replacement required. EXP_23_C remains the correct production model. The prior deployment blocker was based on a false expectation that EXP_DRIVE_11 would match the SHA256 of EXP_DRIVE_08B. This expectation was incorrect. DEPLOYMENT UNBLOCKED.",
+  "official_test_accessed": false,
+  "training_performed": false,
+  "checkpoint_modified": false,
+  "frontend_modified": false,
+  "backend_modified": false,
+  "deployment_performed": false
+}

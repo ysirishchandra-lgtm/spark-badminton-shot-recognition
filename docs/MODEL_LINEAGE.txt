@@ -1,0 +1,99 @@
+SPARK MODEL LINEAGE
+===================
+Generated: 2026-09-21
+
+RESEARCH LINEAGE (multimodal spatial auxiliary branch)
+======================================================
+
+EXP_15_08_03_RICHER_SPATIAL (27-D aux vector established)
+  INPUT: [16x512 visual] + 27D_spatial_aux
+  AUX: hit_xy, player_xy, is_overhead, is_aroundhead, is_backhand,
+       hit_area_zone(10D), opp_xy, d_reach_xy, dist_reach, d_opp_xy, dist_opp
+  OUTPUT: 5 classes
+  Base: ResNet-18 (frozen)
+  SHA256 (checkpoint): NOT TRACKED (older phase)
+  |
+  v
+EXP_DRIVE_05_TEMPORAL_WINDOW
+  INPUT: [16x512 visual Window_C [-4,+11]] + 27D_spatial_aux
+  OUTPUT: 5 classes
+  SHA256: 9b855de5ed06c9c03563d07f225bbe4d522ffa527935d37104b9f2bfc0dbbf23
+  |
+  v
+EXP_DRIVE_08B_HV_MOTION  <-- RESEARCH CHAMPION (multimodal branch)
+  INPUT: [16x512 visual] + 28D_aux (27D_spatial + HV_flow_ratio)
+  HV feature: mean(|u|)/(mean(|v|)+1e-5) over 16 Farneback flow frames
+  Architecture: MultimodalTransformerLSTMClassifier (aux_dim=28)
+    Visual: Proj(512->128) + SinPE + TransformerBlock + LSTM -> [128]
+    Aux:    Linear(28->64) + ReLU + Dropout(0.3) + Linear(64->64) -> [64]
+    Fusion: cat[128+64=192] + Dropout(0.5) + Linear(192->5)
+  Trainable params: 337,221
+  Output: 5 classes (SMASH, CLEAR, DROP, DRIVE, NET_SHOT)
+  Val Accuracy: 77.55%  Macro F1: 68.56%  Weighted F1: 77.49%
+  Epoch: 23  Seed: 123
+  SHA256: 0b296996d8cd7a63a5449a0a6fb21d4e84817be0bed3aeb1b837da4dfc75f164
+  |
+  +------------------------+
+  |                        |
+  v                        v
+EXP_DRIVE_10_EARLY_MOTION  EXP_DRIVE_11_PROTECTED_DRIVE_GATE (built ON TOP of EXP08B)
+  INPUT: [16x512]+29D        FROZEN BASE: EXP_DRIVE_08B (hash verified)
+  Val Acc: 74.18%            GATE INPUT: [5D_logits + 1D_scalar_m]
+  Macro F1: 64.80%           GATE: ProtectedDriveGate (27 trainable params)
+  Not used in prod           g = sigmoid(a*m+b); delta = g*max_res*tanh(MLP(m))
+                             Only DRIVE logit (index 3) is modified
+                             Val Accuracy: 77.55%
+                             Macro F1: 69.35%  Weighted F1: 77.63%
+                             Epoch: 10  Seed: 123
+                             SHA256 (gate only): 9ef77e6bdba535a20e330b2e41a502d37ea58fa7a75d2ec0f9af69519fe5924a
+                             NOT raw-video deployable standalone
+                             Not used in production
+
+PRODUCTION LINEAGE (pure visual branch)
+========================================
+
+EXP_22_B (Transformer+LSTM visual baseline)
+  INPUT: [16x512 visual only]
+  Val Acc: ~63.88%
+  |
+  v
+EXP_23_A (ShuttleSet only, no augmentation)
+  Val Acc: 65.61%  Macro F1: 53.90%  Epoch: 26
+  SHA256: d66bb0829abab466c647ab4a6123797098b6cefabcea4f732772c2fe91b4b039
+  |
+  v
+EXP_23_B (+ VideoBadminton external data)
+  Val Acc: 65.56%  Epoch: 17
+  SHA256: deccb80579e27caf01f2ea1a5b7a1ea3ee8594ca96cc27d3e233e215e8d6cd2b
+  |
+  v
+EXP_23_C  <-- PRODUCTION MODEL (currently deployed in SPARK)
+  INPUT: [16x512 visual only] - raw video capable
+  Architecture: BadmintonTransformerLSTMClassifier
+    Proj(512->128) + SinPE + TransformerBlock + LSTM -> [128]
+    Dropout(0.5) + Linear(128->5)
+  Trainable params: 330,885
+  Data: ShuttleSet(10044) + VideoBadminton(2000) + Cutout/Jitter/Shift augmentation
+  Val Accuracy: 66.73%  Macro F1: 52.82%  Weighted F1: 64.47%
+  Ext Accuracy: 72.00%  Ext Macro F1: 71.37%  (cross-domain)
+  Epoch: 34  Seed: 42
+  SHA256: cd511db28d5df5d0e400ecce957ce0db79ea57c553d862fdf6c2be0360a31e59
+  Status: DEPLOYED + CORRECT
+
+DEPLOYMENT DECISION
+===================
+
+SHA256 confusion resolved:
+  0b296996... = EXP_DRIVE_08B_best_checkpoint.pt (multimodal base, NOT deployable)
+  9ef77e6b...  = EXP_DRIVE_11_best_checkpoint.pt (gate-only head, NOT deployable standalone)
+
+The 77.55% accuracy / 69.35% Macro F1 was produced by:
+  EXP_DRIVE_11 (gate) applied to EXP_DRIVE_08B (base) combined pipeline.
+  Reproduced exactly (task-2303).
+
+The production model EXP_23_C (66.73% val acc, 72% ext acc) is:
+  - Raw-video deployable
+  - Currently correctly installed
+  - SHA256: cd511db28d5df5d0e400ecce957ce0db79ea57c553d862fdf6c2be0360a31e59
+
+VERDICT: DEPLOYMENT UNBLOCKED. No checkpoint changes required.
