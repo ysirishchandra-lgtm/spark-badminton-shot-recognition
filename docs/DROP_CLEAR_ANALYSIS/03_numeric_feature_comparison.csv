@@ -1,0 +1,27 @@
+Feature Key,Feature Name,Category,Group A Mean,Group A Median,Group B Mean,Group B Median,Group C Mean,Group C Median,Group D Mean,Group D Median,Cohen d (A vs C: CLEAR vs DROP),Cohen d (A vs B: CLEAR vs CLEAR->DROP),Cohen d (C vs D: DROP vs DROP->CLEAR),Cohen d (B vs C: Error vs True DROP),Cohen d (D vs A: Error vs True CLEAR)
+hit_x,Hit X Coordinate,Spatial (Court),643.670,651.500,666.743,719.000,650.559,625.000,635.403,613.500,-0.042,-0.142,0.092,0.102,-0.050
+hit_y,Hit Y Coordinate (Depth from Net),Spatial (Court),468.984,498.500,488.073,591.000,453.362,340.000,506.139,586.500,0.107,-0.131,-0.363,0.237,0.257
+player_x,Player X Location,Spatial (Player),636.073,629.000,652.195,663.000,640.580,617.000,624.986,641.000,-0.040,-0.148,0.128,0.097,-0.101
+player_y,Player Y Location,Spatial (Player),466.496,368.000,489.177,577.000,454.204,348.000,499.822,573.000,0.087,-0.162,-0.320,0.242,0.241
+opp_x,Opponent X Location,Spatial (Opponent),641.470,640.000,632.965,640.000,637.160,641.000,643.945,648.000,0.093,0.180,-0.139,-0.080,0.056
+opp_y,Opponent Y Location,Spatial (Opponent),457.073,512.000,448.894,381.000,471.972,538.000,429.466,361.000,-0.150,0.083,0.429,-0.238,-0.276
+dist_reach,Player-to-Shuttle Reach Distance,Spatial (Kinematic),62.343,53.160,48.756,40.050,44.242,35.014,66.680,57.784,0.440,0.327,-0.518,0.124,0.095
+reach_dy,Reach Delta Y (Hit Y - Player Y),Spatial (Kinematic),2.286,-0.500,-1.257,-1.000,-0.339,-1.000,3.736,1.000,0.131,0.167,-0.171,-0.071,0.055
+dist_opp,Player-to-Opponent Distance,Spatial (Tactical),248.581,245.080,251.310,247.257,256.357,250.539,260.515,256.345,-0.233,-0.080,-0.114,-0.132,0.368
+raw_hv_ratio,Farneback H/V Motion Ratio,Temporal Motion,1.665,1.551,1.714,1.690,1.816,1.745,1.712,1.570,-0.287,-0.101,0.179,-0.179,0.096
+early_motion_m,Early Horizontal Motion Rate (m),Temporal Motion,-0.107,-0.121,-0.091,-0.104,-0.093,-0.125,-0.082,-0.094,-0.158,-0.198,-0.099,0.019,0.306
+vis_post_vel,ResNet Visual Feature Velocity (Post-Impact),Temporal Visual,2.162,2.134,2.277,2.276,2.340,2.295,2.182,2.082,-0.474,-0.314,0.379,-0.144,0.055
+vis_early_vel,ResNet Visual Velocity (H to H+4),Temporal Visual,2.443,2.423,2.480,2.493,2.560,2.574,2.456,2.426,-0.265,-0.084,0.228,-0.179,0.029
+vis_late_vel,ResNet Visual Velocity (H+5 to H+9),Temporal Visual,1.938,1.868,2.116,2.022,2.164,2.112,1.962,1.860,-0.530,-0.425,0.415,-0.094,0.062
+vis_vel_ratio_late_early,Visual Velocity Ratio (Late / Early),Temporal Visual,0.805,0.805,0.857,0.835,0.852,0.855,0.809,0.811,-0.306,-0.343,0.270,0.031,0.027
+p_clear,Model P(CLEAR),Model Probability,0.709,0.739,0.263,0.263,0.203,0.189,0.625,0.625,3.776,3.344,-3.316,0.482,-0.623
+p_drop,Model P(DROP),Model Probability,0.231,0.211,0.560,0.526,0.608,0.580,0.301,0.319,-3.323,-3.022,2.502,-0.370,0.680
+p_smash,Model P(SMASH),Model Probability,0.046,0.028,0.152,0.120,0.180,0.166,0.062,0.042,-1.713,-1.606,1.171,-0.253,0.295
+prob_margin_clear_drop,Margin P(CLEAR) - P(DROP),Model Probability,0.478,0.517,-0.297,-0.258,-0.405,-0.430,0.324,0.292,3.800,3.386,-3.209,0.477,-0.670
+logit_clear,EXP08B Base Logit CLEAR,Model Logit,4.154,4.182,2.211,2.294,2.146,2.167,3.793,3.786,1.749,1.738,-1.370,0.056,-0.319
+logit_drop,EXP08B Base Logit DROP,Model Logit,2.937,2.987,3.080,3.278,3.491,3.535,3.013,3.124,-0.562,-0.145,0.485,-0.435,0.074
+logit_margin_clear_drop,Base Logit Margin (CLEAR - DROP),Model Logit,1.216,1.242,-0.869,-0.655,-1.345,-1.175,0.780,0.650,3.219,2.981,-2.397,0.538,-0.639
+landing_y,[NON-DEPLOYABLE] Landing Y Coordinate,Annotation Future,468.409,354.000,461.841,345.000,447.890,455.000,432.041,404.000,0.166,0.045,0.301,0.141,-0.269
+landing_x,[NON-DEPLOYABLE] Landing X Coordinate,Annotation Future,637.787,570.000,643.142,578.000,639.282,574.000,650.699,701.000,-0.009,-0.032,-0.069,0.023,0.078
+disp_dist,[NON-DEPLOYABLE] Hit-to-Landing 2D Displacement,Annotation Future,332.860,317.656,340.705,323.631,277.542,255.123,266.984,239.884,0.703,-0.128,0.101,0.682,-0.969
+disp_dy,[NON-DEPLOYABLE] Longitudinal Flight Displacement (dY),Annotation Future,-0.603,-62.500,-26.688,-246.000,-5.407,130.000,-74.111,-185.000,0.018,0.090,0.356,-0.090,-0.266

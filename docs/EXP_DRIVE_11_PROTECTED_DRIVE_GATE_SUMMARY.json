@@ -1,0 +1,76 @@
+{
+  "experiment": "EXP_DRIVE_11",
+  "type": "protected_drive_gated_motion_fusion",
+  "baseline": "EXP_DRIVE_08B",
+  "official_test_used": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+  "exp10_audit": {
+    "report_consistent_with_raw_results": false,
+    "discrepancies": [
+      "EXP10 report hardcoded EXP08B SMASH F1 as 89.96% instead of raw 69.16%",
+      "EXP10 report hardcoded EXP08B CLEAR F1 as 85.91% instead of raw 73.20%",
+      "EXP10 report hardcoded EXP08B NET_SHOT F1 as 83.50% instead of raw 97.12%",
+      "EXP10 actual deltas vs true EXP08B: SMASH -6.59%, CLEAR -4.35%, DROP -14.65%, DRIVE +6.43%, NET +0.34%"
+    ]
+  },
+  "architecture": {
+    "base_model_frozen": true,
+    "base_parameters": 337221,
+    "trainable_gate_parameters": 27
+  },
+  "feature": {
+    "name": "exp10_early_horizontal_motion",
+    "dimension_added": 0,
+    "used_in": "drive_specific_gate"
+  },
+  "exp08b": {
+    "accuracy": 77.55,
+    "macro_f1": 68.56,
+    "weighted_f1": 77.49
+  },
+  "exp10": {
+    "accuracy": 74.18,
+    "macro_f1": 64.8
+  },
+  "exp11": {
+    "accuracy": 77.55,
+    "macro_f1": 69.35,
+    "weighted_f1": 77.63,
+    "smash_f1": 69.07,
+    "clear_f1": 73.55,
+    "drop_f1": 54.6,
+    "drive_precision": 58.33,
+    "drive_recall": 47.95,
+    "drive_f1": 52.63,
+    "net_shot_f1": 96.9,
+    "drive_to_net": 19,
+    "drive_to_smash": 10
+  },
+  "drive_net_cases": {
+    "total": 20,
+    "corrected_to_drive": 1,
+    "still_net": 19,
+    "moved_to_smash": 0,
+    "moved_to_clear": 0,
+    "moved_to_drop": 0
+  },
+  "six_drive_smash_cases": {
+    "corrected_to_drive": 3,
+    "still_smash": 2,
+    "other": 1
+  },
+  "frontcourt": {
+    "exp08b_correct": 1,
+    "exp10_correct": 1,
+    "exp11_correct": 1,
+    "total": 7
+  },
+  "sample_transitions": {
+    "exp08b_correct_exp11_wrong": 7,
+    "exp08b_wrong_exp11_correct": 7,
+    "both_correct": 1513,
+    "both_wrong": 433
+  },
+  "decision": "CLEAR IMPROVEMENT"
+}

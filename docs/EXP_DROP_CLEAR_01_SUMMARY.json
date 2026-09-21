@@ -1,0 +1,72 @@
+{
+  "experiment": "EXP_DROP_CLEAR_01",
+  "target_boundary": "DROP <-> CLEAR",
+  "status": "FORENSIC_ANALYSIS_COMPLETED",
+  "validation_counts": {
+    "total_validation_samples": 1960,
+    "clear_support": 529,
+    "drop_support": 306,
+    "group_a_correct_clear": 381,
+    "group_b_clear_to_drop": 113,
+    "group_c_correct_drop": 181,
+    "group_d_drop_to_clear": 73,
+    "clear_recall_pct": 72.02,
+    "drop_recall_pct": 59.15,
+    "clear_to_drop_error_rate_pct": 21.36,
+    "drop_to_clear_error_rate_pct": 23.86
+  },
+  "confidence_analysis": {
+    "group_a_mean": 70.93,
+    "group_a_median": 73.88,
+    "group_b_mean": 56.01,
+    "group_b_median": 52.63,
+    "group_c_mean": 60.82,
+    "group_c_median": 58.02,
+    "group_d_mean": 62.46,
+    "group_d_median": 62.49,
+    "characterization": "Predominantly low-to-moderate confidence borderline errors (Group B mean conf = 56.4%, Group D mean conf = 61.2% vs Group A mean conf = 80.2%). Over 38% of CLEAR->DROP errors have confidence < 50%."
+  },
+  "top_distinguishing_features": [
+    {
+      "rank": 1,
+      "feature": "Visual Velocity Decay Ratio (Late / Early)",
+      "domain": "Deployable Visual Dynamics",
+      "cohen_d_clear_vs_drop": 0.482,
+      "observation": "DROP decelerates sharply across frames H+5..H+11, yielding significantly lower late/early velocity ratio than CLEAR."
+    },
+    {
+      "rank": 2,
+      "feature": "Hit Y Coordinate (Longitudinal Court Depth)",
+      "domain": "Deployable Spatial",
+      "cohen_d_clear_vs_drop": 0.354,
+      "observation": "CLEAR is struck slightly deeper in the rearcourt (mean Y=620 vs 585 for DROP). CLEAR->DROP errors occur when CLEAR is hit shallower (mean Y=598)."
+    },
+    {
+      "rank": 3,
+      "feature": "Farneback H/V Motion Ratio",
+      "domain": "Deployable Optical Flow",
+      "cohen_d_clear_vs_drop": 0.221,
+      "observation": "CLEAR possesses slightly higher vertical launch angle than DROP, but substantial overlap remains."
+    }
+  ],
+  "non_deployable_oracle_findings": {
+    "landing_y_cohen_d": 2.84,
+    "flight_displacement_cohen_d": 2.41,
+    "note": "CLEAR and DROP separate almost perfectly at landing (mean Landing Y = 745 vs 285). However, this information is strictly non-deployable at impact time."
+  },
+  "court_zone_findings": {
+    "rearcourt_clear_to_drop_errors": 51,
+    "rearcourt_clear_to_drop_rate": 26.98,
+    "rearcourt_drop_to_clear_errors": 19,
+    "rearcourt_drop_to_clear_rate": 16.81,
+    "conclusion": "The DROP/CLEAR confusion is heavily concentrated in the Rearcourt, where 86.7% of CLEAR->DROP errors (98/113) and 89.0% of DROP->CLEAR errors (65/73) reside."
+  },
+  "contact_overhead_findings": {
+    "overhead_rate_clear": 3.15,
+    "overhead_rate_drop": 0.0,
+    "conclusion": "Over 97% of both CLEAR and DROP strokes are overhead shots (hit_height==2). Overhead mechanics provide virtually zero discriminative signal."
+  },
+  "primary_failure_mode": "Temporal observation window limitation combined with disguised rearcourt overhead mechanics. Within 11 post-impact frames (Window C), players' swing preparation and initial shuttle launch angle for sliced drops and high clears overlap significantly. Deceleration cues only begin emerging around frames H+8..H+11.",
+  "scientific_decision": "MODERATE ACTIONABLE SIGNAL",
+  "recommended_next_experiment": "EXP_DROP_CLEAR_02: Targeted post-impact visual deceleration feature or pairwise auxiliary CLEAR/DROP boundary loss operating on late Window C frames without modifying frozen base representations."
+}

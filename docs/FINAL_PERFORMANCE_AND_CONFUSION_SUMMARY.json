@@ -1,0 +1,105 @@
+{
+  "model": "EXP_DRIVE_11",
+  "train": {
+    "samples": 10044,
+    "accuracy": 87.09,
+    "macro_f1": 81.73,
+    "weighted_f1": 87.07
+  },
+  "validation": {
+    "samples": 1960,
+    "accuracy": 77.55,
+    "macro_f1": 69.35,
+    "weighted_f1": 77.63
+  },
+  "official_test": {
+    "samples": 2001,
+    "accuracy": 76.81,
+    "macro_f1": 66.89,
+    "weighted_f1": 76.87
+  },
+  "generalization_gap": {
+    "train_to_validation_accuracy": -9.54,
+    "validation_to_test_accuracy": -0.74,
+    "train_to_test_accuracy": -10.28,
+    "train_to_validation_macro_f1": -12.38,
+    "validation_to_test_macro_f1": -2.46
+  },
+  "per_class": {
+    "SMASH": {
+      "train_f1": 83.81,
+      "validation_f1": 69.07,
+      "test_f1": 69.83
+    },
+    "CLEAR": {
+      "train_f1": 81.53,
+      "validation_f1": 73.55,
+      "test_f1": 65.34
+    },
+    "DROP": {
+      "train_f1": 68.53,
+      "validation_f1": 54.6,
+      "test_f1": 43.56
+    },
+    "DRIVE": {
+      "train_f1": 76.66,
+      "validation_f1": 52.63,
+      "test_f1": 58.7
+    },
+    "NET_SHOT": {
+      "train_f1": 98.12,
+      "validation_f1": 96.9,
+      "test_f1": 97.02
+    }
+  },
+  "major_test_confusions": [
+    {
+      "true_class": "CLEAR",
+      "predicted_class": "DROP",
+      "count": 117,
+      "percentage_of_true": 26.12,
+      "percentage_of_errors": 25.22
+    },
+    {
+      "true_class": "DROP",
+      "predicted_class": "CLEAR",
+      "count": 81,
+      "percentage_of_true": 32.14,
+      "percentage_of_errors": 17.46
+    },
+    {
+      "true_class": "SMASH",
+      "predicted_class": "DROP",
+      "count": 50,
+      "percentage_of_true": 15.34,
+      "percentage_of_errors": 10.78
+    },
+    {
+      "true_class": "DROP",
+      "predicted_class": "SMASH",
+      "count": 50,
+      "percentage_of_true": 19.84,
+      "percentage_of_errors": 10.78
+    },
+    {
+      "true_class": "SMASH",
+      "predicted_class": "CLEAR",
+      "count": 41,
+      "percentage_of_true": 12.58,
+      "percentage_of_errors": 8.84
+    }
+  ],
+  "drive_confusions": {
+    "validation_drive_to_net": 19,
+    "test_drive_to_net": 28,
+    "validation_drive_to_smash": 10,
+    "test_drive_to_smash": 2
+  },
+  "experiment_evolution": {
+    "exp24_accuracy": 73.32,
+    "exp05_accuracy": 74.95,
+    "exp08b_accuracy": 77.55,
+    "exp10_accuracy": 74.18,
+    "exp11_accuracy": 77.55
+  }
+}

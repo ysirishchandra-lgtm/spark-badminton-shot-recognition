@@ -1,0 +1,11 @@
+Feature Name,Information Domain,Deployable at Prediction Time,Scientific Assessment
+Landing Y Coordinate,Annotation Future,NO (ANALYSIS-ONLY),"Perfect physical separation: CLEAR lands deep rear (mean Y=720+), DROP lands front (mean Y=280). IMPOSSIBLE to deploy at hit time."
+Total Flight Displacement,Annotation Future,NO (ANALYSIS-ONLY),CLEAR flight distance is 2.5x longer than DROP. Cannot deploy at impact without oracle.
+Flight Duration (Frames),Annotation Future,NO (ANALYSIS-ONLY),CLEAR hangs for 35-50 frames; DROP travels 18-28 frames. Requires waiting for rally conclusion.
+Hit Y (Longitudinal Depth),Deployable Spatial,YES,"Both shots are hit in rearcourt (mean Y=620 vs 585). Moderate separation (d=0.35), but cannot resolve rearcourt drops."
+Player Reach Delta Y,Deployable Spatial,YES,Reach delta above player head shows negligible separation (d=0.08); both are overhead strokes.
+Overhead Flag (is_overhead),Deployable Spatial,YES,98.3% of CLEAR and 97.4% of DROP are overhead strokes. Zero discriminative power.
+Visual Feature Velocity Decay (Late/Early),Deployable Temporal,YES,DROP decelerates sharply across frames H+5..H+11 compared to CLEAR (d=0.48). Strongest deployable physical cue.
+ResNet Visual Feature Acceleration,Deployable Temporal,YES,Second derivative of visual embedding norm captures deceleration profile within Window C.
+Farneback H/V Motion Ratio,Deployable Motion,YES,"CLEAR has slightly higher vertical launch than fast attacking drop, but overlap is substantial (d=0.22)."
+Pre-Impact Racket Swing Acceleration,Deployable Video,YES,Disguised drop slices feature late racket deceleration right at impact compared to full-power clear swing.

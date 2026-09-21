@@ -1,0 +1,11 @@
+feature_key,feature_name,domain,cohens_d_SMASH_vs_DROP,auc_SMASH_vs_DROP,Group_A_mean,Group_A_std,Group_B_mean,Group_B_std,Group_C_mean,Group_C_std,Group_D_mean,Group_D_std
+smash_drop_margin,Base Model Logit Margin (z_S - z_D),Frozen Baseline Model,1.5513,0.8625,-1.4641,0.9191,0.8881,0.6775,2.0477,1.3882,-0.9046,0.6485
+early_post_vel,Early Post-Impact Feature Velocity,Window C Early Acceleration,0.4235,0.6122,2.1668,0.5453,2.4473,0.4771,2.5733,0.5930,2.0876,0.5626
+pre_impact_vel,Pre-Impact Preparation Velocity,Window C Swing Backswing,0.2955,0.5803,2.1748,0.5287,2.2848,0.4701,2.4480,0.6717,2.1120,0.6449
+vel_decay_ratio,Late/Early Visual Velocity Decay,Window C Feature Trajectory,-0.2349,0.5713,1.1444,0.2544,1.0584,0.1746,1.0576,0.2091,1.1275,0.2656
+raw_hv_ratio,Horizontal-to-Vertical Motion Ratio,Observed Window C Optical Flow,-0.1557,0.5499,1.8165,0.6071,1.7303,0.5915,1.6702,0.5785,1.8307,0.7373
+hit_y,Hit Y Coordinate (Court Depth),Spatial Geometry,0.0026,0.5178,453.3616,147.4838,466.4468,139.2183,456.9028,140.1154,454.6863,139.0126
+hit_x,Hit X Coordinate (Lateral Position),Spatial Geometry,-0.0506,0.5174,650.5593,159.4586,675.1702,147.5462,649.5000,146.2204,642.4510,123.1822
+aroundhead,Around-the-Head Binary Indicator,Pose Context,0.0645,0.5158,0.3702,0.4828,0.3830,0.4861,0.3909,0.4880,0.4561,0.4981
+backhand,Backhand Binary Indicator,Pose Context,-0.2224,0.5110,0.0276,0.1639,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+reach_dist,Player-to-Shuttle 2D Reach Distance,Spatial Geometry,0.1195,0.5046,44.2416,36.6009,46.2409,51.2752,53.8868,66.1134,38.6884,32.3630

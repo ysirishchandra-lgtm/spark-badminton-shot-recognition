@@ -1,0 +1,7 @@
+Feature,Description,Category,Group A Mean,Group B Mean,Group C Mean,Group D Mean,Cohen d (A vs C),Cohen d (A vs B),Cohen d (C vs D)
+raw_hv_ratio,Farneback H/V Ratio (Global),Deployable Optical Flow,1.6651,1.7145,1.8165,1.7120,-0.287,-0.101,0.179
+early_motion_m,Early Horizontal Motion Rate (m),Deployable Optical Flow,-0.1070,-0.0907,-0.0927,-0.0820,-0.158,-0.198,-0.099
+vis_post_vel,Window C ResNet Feature Velocity (H to H+9),Deployable Visual Dynamics,2.1622,2.2774,2.3397,2.1815,-0.474,-0.314,0.379
+vis_early_vel,ResNet Visual Velocity Early (H to H+4),Deployable Visual Dynamics,2.4431,2.4796,2.5598,2.4560,-0.265,-0.084,0.228
+vis_late_vel,ResNet Visual Velocity Late (H+5 to H+9),Deployable Visual Dynamics,1.9375,2.1157,2.1635,1.9620,-0.530,-0.425,0.415
+vis_vel_ratio_late_early,Late / Early Velocity Ratio (Deceleration Metric),Deployable Visual Dynamics,0.8047,0.8574,0.8523,0.8088,-0.306,-0.343,0.270

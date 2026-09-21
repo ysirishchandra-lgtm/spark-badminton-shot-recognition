@@ -1,0 +1,46 @@
+{
+  "experiment": "EXP_DRIVE_08C",
+  "type": "complementary_error_audit",
+  "training_performed": false,
+  "official_test_used": false,
+  "production_modified": false,
+  "validation_samples": 1960,
+  "exp05": {
+    "accuracy": 74.95,
+    "macro_f1": 65.22,
+    "weighted_f1": 74.16
+  },
+  "exp08b": {
+    "accuracy": 77.55,
+    "macro_f1": 68.56,
+    "weighted_f1": 77.49
+  },
+  "sample_groups": {
+    "both_correct": 1357,
+    "both_wrong": 328,
+    "exp05_only_correct": 112,
+    "exp08b_only_correct": 163
+  },
+  "error_overlap": {
+    "exp05_errors": 491,
+    "exp08b_errors": 440,
+    "shared_errors": 328,
+    "union_errors": 603,
+    "shared_error_fraction": 0.5439
+  },
+  "oracle_union": {
+    "accuracy": 83.27
+  },
+  "drive": {
+    "both_correct": 24,
+    "exp05_only_correct": 11,
+    "exp08b_only_correct": 4,
+    "both_wrong": 34
+  },
+  "frontcourt": {
+    "exp05_correct": 1,
+    "exp08b_correct": 1,
+    "total": 7
+  },
+  "ensemble_decision": "ENSEMBLE JUSTIFIED"
+}

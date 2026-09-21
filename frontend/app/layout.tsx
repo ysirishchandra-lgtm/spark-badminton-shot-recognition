@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import BadmintonCourtBackground from '@/components/BadmintonCourtBackground';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'SPARK — AI-Powered Badminton Shot Recognition',
   description:
-    'Analyze badminton match videos and recognize badminton shot types using deep learning and temporal video analysis.',
+    'Deep computer vision and temporal sequence modeling for automated badminton stroke recognition. Fast, robust, and research-calibrated.',
 };
 
 export default function RootLayout({
@@ -35,13 +37,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen court-grid-pattern flex flex-col antialiased">
+      <body className="min-h-screen court-grid-pattern flex flex-col antialiased relative">
         <ThemeProvider>
+          <BadmintonCourtBackground />
           <Header />
-          <main className="flex-1">{children}</main>
-          <footer className="w-full border-t border-[var(--border-subtle)] py-6 bg-[var(--header-bg)] text-center text-xs text-[var(--text-muted)] font-mono transition-colors duration-200">
-            SPARK — AI-Powered Badminton Shot Recognition • Academic Research Project • Team: Sirish Chandra, Priyanshu, Ashwidha, Thakur Swetan Singh, Kaustub
-          </footer>
+          <main className="flex-1 relative z-10">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

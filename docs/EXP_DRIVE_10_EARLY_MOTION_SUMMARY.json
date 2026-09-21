@@ -1,0 +1,52 @@
+{
+  "experiment": "EXP_DRIVE_10",
+  "baseline": "EXP_DRIVE_08B",
+  "type": "single_feature_early_observed_motion",
+  "deployability_gate": {
+    "passed": true,
+    "uses_future_annotations": false,
+    "uses_manual_coordinates": false,
+    "automatic_from_video": true
+  },
+  "training": {
+    "performed": true,
+    "seed": 123,
+    "epochs": 9
+  },
+  "feature": {
+    "name": "early_observed_forward_motion_rate",
+    "dimension_added": 1,
+    "aux_dimension_before": 28,
+    "aux_dimension_after": 29,
+    "definition": "Mean absolute horizontal Farneback flow |u| over first 5 post-impact transitions [H -> H+5]",
+    "normalization": "z-score fitted strictly on training partition only"
+  },
+  "exp08b": {
+    "accuracy": 77.55,
+    "macro_f1": 68.56,
+    "weighted_f1": 77.49
+  },
+  "exp10": {
+    "accuracy": 74.18,
+    "macro_f1": 64.8,
+    "weighted_f1": 73.28,
+    "smash_f1": 62.57,
+    "clear_f1": 68.85,
+    "drop_f1": 40.0,
+    "drive_precision": 51.81,
+    "drive_recall": 58.9,
+    "drive_f1": 55.13,
+    "net_shot_f1": 97.46,
+    "drive_to_net": 18,
+    "drive_to_smash": 9
+  },
+  "drive_net_cases": {
+    "total": 20,
+    "corrected_to_drive": 4,
+    "still_net": 16,
+    "moved_to_smash": 0,
+    "moved_to_clear": 0,
+    "moved_to_drop": 0
+  },
+  "decision": "REGRESSION"
+}

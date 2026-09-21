@@ -1,0 +1,6 @@
+group_id,group_name,true_class,pred_class,sample_count,pct_of_true_class,pct_of_total_errors
+Group_A,Correct_DROP,DROP,DROP,181,59.15%,—
+Group_B,DROP_to_SMASH,DROP,SMASH,47,15.36%,10.68%
+Group_C,Correct_SMASH,SMASH,SMASH,220,66.27%,—
+Group_D,SMASH_to_DROP,SMASH,DROP,57,17.17%,12.95%
+Total_Errors,Mutual_DROP_SMASH,DROP/SMASH,SMASH/DROP,104,—,23.64%

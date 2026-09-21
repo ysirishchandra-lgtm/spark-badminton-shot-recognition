@@ -1,0 +1,46 @@
+{
+  "experiment": "EXP_DRIVE_08D",
+  "type": "fixed_50_50_probability_ensemble",
+  "training_performed": false,
+  "official_test_used": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+  "validation_samples": 1960,
+  "exp05": {
+    "accuracy": 74.95,
+    "macro_f1": 65.22,
+    "weighted_f1": 74.16
+  },
+  "exp08b": {
+    "accuracy": 77.55,
+    "macro_f1": 68.56,
+    "weighted_f1": 77.49
+  },
+  "ensemble": {
+    "weight_exp05": 0.5,
+    "weight_exp08b": 0.5,
+    "accuracy": 77.09,
+    "macro_f1": 68.06,
+    "weighted_f1": 76.72,
+    "drive_f1": 51.97,
+    "smash_f1": 68.93,
+    "clear_f1": 73.24,
+    "drop_f1": 48.96,
+    "net_shot_f1": 97.18,
+    "drive_to_net": 20,
+    "drive_to_smash": 13
+  },
+  "sample_impact": {
+    "both_models_correct": 1357,
+    "both_models_wrong": 328,
+    "ensemble_correct_both_wrong": 2,
+    "ensemble_wrong_both_correct": 0,
+    "exp05_only_correct": 112,
+    "exp08b_only_correct": 163,
+    "group_c_exp05_correct_ensemble_correct": 70,
+    "group_c_exp05_correct_ensemble_wrong": 42,
+    "group_d_exp08b_correct_ensemble_correct": 82,
+    "group_d_exp08b_correct_ensemble_wrong": 81
+  },
+  "decision": "REGRESSION"
+}

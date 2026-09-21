@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import urllib.request
 import json
+import io
 import httpx
 from backend.app.core.config import settings
 

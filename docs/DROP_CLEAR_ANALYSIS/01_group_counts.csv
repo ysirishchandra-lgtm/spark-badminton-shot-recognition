@@ -1,0 +1,7 @@
+Group,Definition,True Class,Predicted Class,Sample Count (N),% of True Class,Status
+Group A,Correct CLEAR,CLEAR,CLEAR,381,72.02%,Correct
+Group B,CLEAR -> DROP Error,CLEAR,DROP,113,21.36%,Error
+Group C,Correct DROP,DROP,DROP,181,59.15%,Correct
+Group D,DROP -> CLEAR Error,DROP,CLEAR,73,23.86%,Error
+Total CLEAR,All True CLEAR,CLEAR,-,529,100.00%,-
+Total DROP,All True DROP,DROP,-,306,100.00%,-

@@ -1,0 +1,12 @@
+context_dimension,category,Group_A_Correct_DROP,Group_B_DROP_to_SMASH,Group_C_Correct_SMASH,Group_D_SMASH_to_DROP,DROP_to_SMASH_error_rate,SMASH_to_DROP_error_rate
+Court_Zone,Frontcourt,46,5,24,5,9.80%,17.24%
+Court_Zone,Midcourt,60,20,77,10,25.00%,11.49%
+Court_Zone,Rearcourt,71,21,110,35,22.83%,24.14%
+Aroundhead,AH=0,114,29,134,31,20.28%,18.79%
+Aroundhead,AH=1,67,18,86,26,21.18%,23.21%
+Backhand,BH=0,176,47,220,57,21.08%,20.58%
+Backhand,BH=1,5,0,0,0,0.00%,0.00%
+Rally_Round,1-2 (Opening),15,3,27,12,16.67%,30.77%
+Rally_Round,3-5 (Early),41,11,65,13,21.15%,16.67%
+Rally_Round,6-10 (Mid-Rally),47,24,54,22,33.80%,28.95%
+Rally_Round,>10 (Late/Extended),78,9,74,10,10.34%,11.90%

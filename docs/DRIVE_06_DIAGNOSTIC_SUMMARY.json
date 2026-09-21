@@ -1,0 +1,55 @@
+{
+  "experiment": "EXP_DRIVE_06_DIAGNOSTIC",
+  "type": "diagnostic_only",
+  "training_performed": false,
+  "official_test_used": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+
+  "exp24": {
+    "accuracy": 73.32,
+    "macro_f1": 61.47,
+    "weighted_f1": 70.76,
+    "drive_precision": 56.52,
+    "drive_recall": 53.42,
+    "drive_f1": 54.93,
+    "drive_to_net": 21,
+    "drive_to_smash": 10
+  },
+
+  "exp05": {
+    "accuracy": 74.95,
+    "macro_f1": 65.22,
+    "weighted_f1": 74.16,
+    "drive_precision": 58.33,
+    "drive_recall": 47.95,
+    "drive_f1": 52.63,
+    "drive_to_net": 16,
+    "drive_to_smash": 14
+  },
+
+  "drive_transition": {
+    "correct_to_smash": 5,
+    "correct_to_net": 2,
+    "net_to_correct": 6,
+    "smash_to_correct": 0,
+    "new_drive_to_smash": 6
+  },
+
+  "frontcourt": {
+    "exp24_correct": 0,
+    "exp05_correct": 1,
+    "total": 7
+  },
+
+  "hypotheses": {
+    "H1_post_impact_separates_drive_net": "SUPPORTED",
+    "H2_post_impact_increases_smash_similarity": "SUPPORTED",
+    "H3_zone_concentration": "PARTIALLY_SUPPORTED",
+    "H4_overhead_concentration": "NOT_SUPPORTED",
+    "H5_confidence_redistribution": "PARTIALLY_SUPPORTED",
+    "H6_heterogeneous_failure": "PARTIALLY_SUPPORTED"
+  },
+
+  "recommended_next_direction": "Investigate geometric flight angle (delta_y / delta_x) and vertical impact height relative to net clearance to decouple fast horizontal sidearm drives from downward smashes before altering any model training."
+}

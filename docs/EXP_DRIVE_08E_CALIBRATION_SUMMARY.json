@@ -1,0 +1,39 @@
+{
+  "experiment": "EXP_DRIVE_08E",
+  "type": "probability_calibration_and_fixed_ensemble",
+  "full_model_training": false,
+  "official_test_used": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+  "calibration": {
+    "method": "temperature_scaling",
+    "fit_on_validation": false,
+    "t_exp05": 0.9643,
+    "t_exp08b": 0.817
+  },
+  "baseline": {
+    "exp05_accuracy": 74.95,
+    "exp08b_accuracy": 77.55,
+    "raw_ensemble_accuracy": 77.09
+  },
+  "calibrated_ensemble": {
+    "accuracy": 77.14,
+    "macro_f1": 67.82,
+    "weighted_f1": 76.8,
+    "drive_f1": 50.0,
+    "smash_f1": 68.85,
+    "clear_f1": 73.43,
+    "drop_f1": 49.66,
+    "net_shot_f1": 97.18,
+    "drive_recall": 42.47,
+    "drive_precision": 60.78,
+    "drive_to_net": 20,
+    "drive_to_smash": 14
+  },
+  "ensemble_changes": {
+    "raw_vs_calibrated_changed_predictions": 20,
+    "raw_correct_to_calibrated_wrong": 8,
+    "raw_wrong_to_calibrated_correct": 9
+  },
+  "decision": "CALIBRATION MIXED / INSUFFICIENT (DOES NOT IMPROVE OVER EXP08B)"
+}

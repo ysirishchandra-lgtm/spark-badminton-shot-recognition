@@ -1,0 +1,107 @@
+{
+  "experiment": "EXP_DRIVE_08A",
+  "type": "visual_motion_feasibility_audit",
+  "training_performed": false,
+  "official_test_used": false,
+  "features": {
+    "temporal_difference": {
+      "drive_mean": 0.4867,
+      "drive_std": 0.1672,
+      "drive_median": 0.4904,
+      "drive_iqr": 0.2407,
+      "smash_mean": 0.5019,
+      "smash_std": 0.1871,
+      "smash_median": 0.4432,
+      "smash_iqr": 0.3186,
+      "cohens_d": -0.083,
+      "cliffs_delta": -0.022,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    },
+    "flow_magnitude": {
+      "drive_mean": 0.0661,
+      "drive_std": 0.0282,
+      "drive_median": 0.0605,
+      "drive_iqr": 0.0332,
+      "smash_mean": 0.0743,
+      "smash_std": 0.0344,
+      "smash_median": 0.0646,
+      "smash_iqr": 0.0509,
+      "cohens_d": -0.243,
+      "cliffs_delta": -0.108,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    },
+    "horizontal_motion": {
+      "drive_mean": 0.0564,
+      "drive_std": 0.0269,
+      "drive_median": 0.0483,
+      "drive_iqr": 0.0309,
+      "smash_mean": 0.0555,
+      "smash_std": 0.0262,
+      "smash_median": 0.0497,
+      "smash_iqr": 0.0387,
+      "cohens_d": 0.032,
+      "cliffs_delta": 0.026,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    },
+    "vertical_motion": {
+      "drive_mean": 0.0233,
+      "drive_std": 0.0087,
+      "drive_median": 0.023,
+      "drive_iqr": 0.0126,
+      "smash_mean": 0.0351,
+      "smash_std": 0.0205,
+      "smash_median": 0.0281,
+      "smash_iqr": 0.0233,
+      "cohens_d": -0.622,
+      "cliffs_delta": -0.354,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    },
+    "motion_ratio": {
+      "drive_mean": 2.4693,
+      "drive_std": 0.8361,
+      "drive_median": 2.2951,
+      "drive_iqr": 1.0779,
+      "smash_mean": 1.726,
+      "smash_std": 0.6331,
+      "smash_median": 1.607,
+      "smash_iqr": 0.633,
+      "cohens_d": 1.1,
+      "cliffs_delta": 0.566,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    },
+    "post_impact_motion": {
+      "drive_mean": 0.0646,
+      "drive_std": 0.0274,
+      "drive_median": 0.0584,
+      "drive_iqr": 0.0285,
+      "smash_mean": 0.0759,
+      "smash_std": 0.0345,
+      "smash_median": 0.0665,
+      "smash_iqr": 0.0525,
+      "cohens_d": -0.338,
+      "cliffs_delta": -0.165,
+      "deployability": "DEPLOYABLE_WITH_OBSERVED_VIDEO"
+    }
+  },
+  "six_new_drive_smash_cases": 6,
+  "camera_motion": {
+    "mean_cam_speed_drive": 3e-05,
+    "mean_cam_speed_smash": 0.000266,
+    "camera_corrected_cohens_d": -0.243,
+    "finding": "Static tripod-mounted high court broadcast camera; global camera motion is negligible (mean speed < 0.001 px/frame) and does not confound the visual motion signal."
+  },
+  "contamination_assessment": {
+    "source": "Player body and racket swing dynamics dominate pixel motion (shuttlecock is small, 2-4 px).",
+    "nature": "Player-dominant and racket-swing-dominant. In SMASH, overhead body flexion and vertical follow-through create high vertical flow (|v|=0.035). In DRIVE, sidearm torso rotation and horizontal wrist flick create predominantly horizontal flow (|u|=0.056, |v|=0.023).",
+    "classification": "PLAYER_RACKET_DOMINANT"
+  },
+  "hypotheses": {
+    "motion_magnitude_separation": "NOT_SUPPORTED",
+    "post_impact_separation": "PARTIALLY_SUPPORTED",
+    "direction_separation": "SUPPORTED",
+    "six_case_signature": "PARTIALLY_SUPPORTED",
+    "player_camera_dominance": "SUPPORTED",
+    "exp08_justified": "SUPPORTED"
+  },
+  "recommended_next_direction": "A single controlled experiment (EXP_DRIVE_08B) is scientifically justified to evaluate fusing deployable visual motion ratio (Horizontal/Vertical Flow Ratio, Cohen's d = +1.100) into the auxiliary MLP alongside Window C [-4, +11]."
+}

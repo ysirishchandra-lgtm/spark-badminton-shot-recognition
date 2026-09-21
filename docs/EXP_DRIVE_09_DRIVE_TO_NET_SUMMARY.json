@@ -1,0 +1,38 @@
+{
+  "experiment": "EXP_DRIVE_09",
+  "type": "drive_to_net_diagnostic",
+  "training_performed": false,
+  "official_test_used": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+  "exp08b": {
+    "accuracy": 77.55,
+    "macro_f1": 68.56,
+    "drive_f1": 48.7,
+    "drive_recall": 38.36,
+    "drive_to_net": 20,
+    "drive_to_smash": 11
+  },
+  "cohorts": {
+    "true_drive_to_net": 20,
+    "true_net_correct": 707,
+    "true_drive_correct": 28
+  },
+  "frontcourt": {
+    "total_cases": 7,
+    "drive_to_net": 6,
+    "drive_correct": 1
+  },
+  "hypotheses": {
+    "frontcourt_concentration": "PARTIALLY SUPPORTED (30% minority)",
+    "contact_type": "SUPPORTED (70% high contact / is_overhead=1)",
+    "spatial_signature": "PARTIALLY SUPPORTED (bimodal: frontcourt 30%, mid/rear 70%)",
+    "temporal_signature": "PARTIALLY SUPPORTED (d=0.85 higher HV than net, but 40% near zero)",
+    "hv_feature_effect": "SUPPORTED (4 correct drives flipped to net)",
+    "net_prior": "SUPPORTED (massive 44% prior drives net overconfidence)",
+    "deployable_proxy": "SUPPORTED (implied speed d=3.05 separates drive from net)",
+    "heterogeneous_failure": "SUPPORTED (dual-modal front vs mid/rear failure)"
+  },
+  "next_experiment_justified": true,
+  "recommended_single_variable": "Observed early shuttle forward displacement rate (delta_x / delta_t in observed window)"
+}

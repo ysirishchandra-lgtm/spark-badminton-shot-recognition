@@ -8,6 +8,7 @@ import ThemeToggle from './ThemeToggle';
 export default function Header() {
   const [health, setHealth] = useState<BackendHealthResponse | null>(null);
   const [checking, setChecking] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -35,36 +36,66 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-500/20 flex-shrink-0">
-            {/* Badminton Shuttlecock / Spark Icon SVG */}
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-lg sm:text-xl font-bold tracking-wider text-[var(--text-primary)]">
-                SPARK
-              </span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
-                AI Vision
-              </span>
+          <a href="#" className="flex items-center space-x-3 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
+              {/* Shuttlecock Spark Icon SVG */}
+              <svg
+                className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] hidden sm:block">
-              AI-Powered Badminton Shot Recognition
-            </p>
-          </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-lg sm:text-xl font-black tracking-wider text-[var(--text-primary)]">
+                  SPARK
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono font-semibold">
+                  PROD v1.0
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)] hidden sm:block leading-tight">
+                Badminton Shot Recognition System
+              </p>
+            </div>
+          </a>
         </div>
+
+        {/* Center Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <a
+            href="#analyze"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)] transition-colors"
+          >
+            Analyze Video
+          </a>
+          <a
+            href="#classes"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)] transition-colors"
+          >
+            Shot Taxonomy
+          </a>
+          <a
+            href="#architecture"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)] transition-colors"
+          >
+            Architecture
+          </a>
+          <a
+            href="#limitations"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)] transition-colors"
+          >
+            Disclosures
+          </a>
+        </nav>
 
         {/* Action Controls: Backend Status Pill, Theme Switcher, GitHub Link */}
         <div className="flex items-center space-x-2 sm:space-x-3">
@@ -99,7 +130,7 @@ export default function Header() {
             href="https://github.com/ysirishchandra-lgtm/spark-badminton-shot-recognition"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-2 rounded-xl hover:bg-[var(--bg-secondary)] border border-transparent hover:border-[var(--border-subtle)]"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-2 rounded-xl hover:bg-[var(--bg-secondary)] border border-transparent hover:border-[var(--border-subtle)] hidden sm:inline-flex"
             title="GitHub Repository"
             aria-label="GitHub Repository"
           >
@@ -111,8 +142,57 @@ export default function Header() {
               />
             </svg>
           </a>
+
+          {/* Mobile hamburger toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] focus:outline-none"
+            aria-label="Toggle navigation menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Mobile dropdown nav */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--header-bg)] px-4 py-3 space-y-2">
+          <a
+            href="#analyze"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)]"
+          >
+            Analyze Video
+          </a>
+          <a
+            href="#classes"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)]"
+          >
+            Shot Taxonomy
+          </a>
+          <a
+            href="#architecture"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)]"
+          >
+            Architecture
+          </a>
+          <a
+            href="#limitations"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-[var(--bg-secondary)]"
+          >
+            Disclosures
+          </a>
+        </div>
+      )}
     </header>
   );
 }

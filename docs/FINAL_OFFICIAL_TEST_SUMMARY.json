@@ -1,0 +1,46 @@
+{
+  "evaluation": "FINAL_OFFICIAL_TEST",
+  "test_samples": 2001,
+  "test_matches": [
+    "MATCH09",
+    "MATCH13",
+    "MATCH20",
+    "MATCH34",
+    "MATCH39",
+    "MATCH41",
+    "MATCH43"
+  ],
+  "training_performed": false,
+  "test_tuning_performed": false,
+  "production_modified": false,
+  "hitheatmap_used": false,
+  "exp08b": {
+    "accuracy": 76.46,
+    "macro_f1": 65.02,
+    "weighted_f1": 76.33,
+    "smash_f1": 70.42,
+    "clear_f1": 65.35,
+    "drop_f1": 43.24,
+    "drive_f1": 49.37,
+    "net_shot_f1": 96.7,
+    "drive_to_net": 35,
+    "drive_to_smash": 4
+  },
+  "exp11": {
+    "accuracy": 76.81,
+    "macro_f1": 66.89,
+    "weighted_f1": 76.87,
+    "smash_f1": 69.83,
+    "clear_f1": 65.34,
+    "drop_f1": 43.56,
+    "drive_f1": 58.7,
+    "net_shot_f1": 97.02,
+    "drive_to_net": 28,
+    "drive_to_smash": 2
+  },
+  "delta_exp11_minus_exp08b": {
+    "accuracy": 0.35,
+    "macro_f1": 1.87,
+    "weighted_f1": 0.54
+  }
+}

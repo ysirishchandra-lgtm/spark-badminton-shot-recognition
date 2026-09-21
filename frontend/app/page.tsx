@@ -5,6 +5,8 @@ import ShotClassBadges from '@/components/ShotClassBadges';
 import VideoUploader from '@/components/VideoUploader';
 import VideoPreview from '@/components/VideoPreview';
 import ResultsDisplay from '@/components/ResultsDisplay';
+import ArchitectureSection from '@/components/ArchitectureSection';
+import LimitationsSection from '@/components/LimitationsSection';
 import { VideoUploadResponse, VideoAnalysisResponse, AnalysisStatus } from '@/types';
 import { analyzeVideo } from '@/lib/api';
 
@@ -62,72 +64,102 @@ export default function HomePage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       {/* Hero Section */}
-      <section className="text-center space-y-3 max-w-3xl mx-auto pt-2 pb-1">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono tracking-wide">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>Sports AI & Computer Vision</span>
+      <section className="text-center space-y-4 max-w-4xl mx-auto pt-4 pb-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-semibold tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            <span>AI-POWERED BADMINTON SHOT RECOGNITION</span>
+          </div>
+
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-xs font-mono">
+            <span>Validation Benchmark: <strong className="text-emerald-600 dark:text-emerald-400">77.55% Acc</strong> • <strong className="text-emerald-600 dark:text-emerald-400">69.35% F1</strong></span>
+          </div>
         </div>
-        
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight leading-tight">
-          AI-Powered Badminton{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
-            Shot Recognition
+
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[var(--text-primary)] tracking-tight leading-tight">
+          Professional Badminton{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
+            Stroke Intelligence
           </span>
         </h1>
 
-        <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed">
-          Analyze badminton match video and identify the shot being played using deep learning and temporal video analysis.
+        <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
+          Deep computer vision and temporal sequence modeling calibrated to recognize competitive stroke mechanics, kinematics, and shot trajectory.
         </p>
       </section>
 
       {/* Target Classes Taxonomy Badges */}
-      <section className="pt-1">
-        <ShotClassBadges />
-      </section>
+      <ShotClassBadges />
 
       {/* Main Upload and Preview Grid */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Upload & Actions */}
-        <div className="lg:col-span-5 space-y-6">
-          <VideoUploader
-            selectedFile={selectedFile}
-            onFileSelected={handleFileSelected}
-            onUploadSuccess={handleUploadSuccess}
-            onAnalyzeClick={handleAnalyzeClick}
-            status={status}
-            errorMessage={errorMessage}
-            onDismissError={handleDismissError}
-            videoId={uploadResult?.video_id || null}
-          />
+      <section id="analyze" className="scroll-mt-20 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] pb-4 gap-2">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+              Match Clip Analysis Studio
+            </h2>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+              Upload an isolated match stroke clip (MP4, AVI, MOV) for automated frame sampling and deep inference.
+            </p>
+          </div>
+          <div className="text-xs font-mono text-[var(--text-muted)]">
+            Max 100MB • 16 Chronological Frames
+          </div>
         </div>
 
-        {/* Right Column: Video Preview or Interactive State */}
-        <div className="lg:col-span-7 space-y-6">
-          {selectedFile ? (
-            <VideoPreview file={selectedFile} onClear={handleClearVideo} />
-          ) : (
-            <div className="w-full spark-card border-dashed rounded-2xl p-10 text-center flex flex-col items-center justify-center min-h-[320px]">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] mb-4 shadow-sm">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Upload & Actions */}
+          <div className="lg:col-span-5 space-y-6">
+            <VideoUploader
+              selectedFile={selectedFile}
+              onFileSelected={handleFileSelected}
+              onUploadSuccess={handleUploadSuccess}
+              onAnalyzeClick={handleAnalyzeClick}
+              status={status}
+              errorMessage={errorMessage}
+              onDismissError={handleDismissError}
+              videoId={uploadResult?.video_id || null}
+            />
+          </div>
+
+          {/* Right Column: Video Preview or Interactive State */}
+          <div className="lg:col-span-7 space-y-6">
+            {selectedFile ? (
+              <VideoPreview file={selectedFile} onClear={handleClearVideo} />
+            ) : (
+              <div className="w-full spark-card border-dashed rounded-2xl p-10 text-center flex flex-col items-center justify-center min-h-[340px]">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] mb-4 shadow-sm">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h4 className="text-base font-semibold text-[var(--text-primary)]">
+                  Video Player Preview Active Upon Upload
+                </h4>
+                <p className="text-xs text-[var(--text-secondary)] mt-2 max-w-sm">
+                  Select a video file to verify playback, inspect duration and dimensions, and initiate automated frame extraction.
+                </p>
               </div>
-              <h4 className="text-base font-semibold text-[var(--text-primary)]">
-                Video Player Preview
-              </h4>
-              <p className="text-xs text-[var(--text-secondary)] mt-2 max-w-sm">
-                Select or drag and drop a badminton match clip to activate preview playback and verify file details prior to analysis.
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </section>
 
       {/* Results Section */}
-      <section className="pt-2">
+      <section id="results" className="scroll-mt-20">
         <ResultsDisplay
           videoId={uploadResult?.video_id || null}
           uploadedFilename={uploadResult?.filename || null}
@@ -136,6 +168,12 @@ export default function HomePage() {
           errorMessage={errorMessage}
         />
       </section>
+
+      {/* Technical Architecture Section */}
+      <ArchitectureSection />
+
+      {/* Scientific Disclosures & Limitations Section */}
+      <LimitationsSection />
     </div>
   );
 }

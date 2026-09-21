@@ -1,0 +1,13 @@
+Feature,Classification,Observation_Window,Latency_Impact,Source_Implementation
+Raw H/V Motion Ratio,DEPLOYABLE,"Window C [-4, +11]",367 ms post-hit,Observed optical flow
+Visual Velocity Decay (Late/Early),DEPLOYABLE,"Window C [-4, +11]",367 ms post-hit,ResNet embedding velocity
+Early Post-Impact Velocity,DEPLOYABLE,"Window C [H, H+4]",133 ms post-hit,ResNet embedding velocity
+Pre-Impact Preparation Velocity,DEPLOYABLE,"Window C [H-4, H]",0 ms (pre-hit),ResNet embedding velocity
+Player 2D Reach Distance,DEPLOYABLE,Frame H,0 ms (at impact),TrackNet + AlphaPose
+Court Hit Zone / Hit Area,DEPLOYABLE,Frame H,0 ms (at impact),TrackNet shuttle coordinate
+Previous Stroke Class,DEPLOYABLE,Prior stroke,0 ms (sequential),Rally history buffer
+Around-the-Head Indicator,CONDITIONALLY DEPLOYABLE,Frame H,Requires pose model,Arm-head skeleton geometry
+Backhand Indicator,CONDITIONALLY DEPLOYABLE,Frame H,Requires pose model,Wrist-shoulder orientation
+Next Stroke Class,DIAGNOSTIC ONLY,Subsequent stroke,Future information,Annotation only
+"Landing Coordinates (X, Y)",DIAGNOSTIC ONLY,Post-landing,Future information,Annotation only
+Landing Height,DIAGNOSTIC ONLY,Post-landing,Future information,Annotation only

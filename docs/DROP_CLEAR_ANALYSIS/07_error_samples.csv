@@ -1,0 +1,7 @@
+Type,Match ID,Hit Frame,True Class,Predicted Class,Confidence (%),P(CLEAR),P(DROP),P(SMASH),Hit Y,Player Y,Court Zone,Is Overhead,H/V Ratio,Visual Late/Early Ratio,Landing Y [Oracle],Why Representative
+High-Confidence CLEAR -> DROP,MATCH07,69995,CLEAR,DROP,88.59%,0.040,0.886,0.058,350.0,362.0,Rearcourt,0,2.152,0.855,676.0,Confidently predicted as DROP despite ground-truth CLEAR label; strong visual deceleration resemblance
+Borderline CLEAR -> DROP,MATCH07,31356,CLEAR,DROP,29.32%,0.194,0.293,0.249,345.0,365.0,Rearcourt,0,1.604,0.808,644.0,Equivocal prediction right at decision boundary (P(CLEAR) ~ P(DROP))
+High-Confidence DROP -> CLEAR,MATCH37,83265,DROP,CLEAR,96.91%,0.969,0.027,0.000,307.0,310.0,Midcourt,1,3.184,0.948,493.0,Confidently predicted as CLEAR despite ground-truth DROP label; high contact point and deep rearcourt position
+Borderline DROP -> CLEAR,MATCH37,57706,DROP,CLEAR,35.28%,0.353,0.336,0.311,617.0,616.0,Rearcourt,0,1.768,0.942,356.0,Equivocal prediction with marginal logit difference
+Typical Correct CLEAR,MATCH40,33177,CLEAR,CLEAR,73.88%,0.739,0.070,0.006,343.0,354.0,Midcourt,0,1.518,0.657,593.0,Median-confidence prototypical high rearcourt clear with high clearance
+Typical Correct DROP,MATCH07,25921,DROP,DROP,58.02%,0.024,0.580,0.261,341.0,337.0,Midcourt,0,1.355,1.185,522.0,Median-confidence prototypical soft touch drop terminating in mid/frontcourt
