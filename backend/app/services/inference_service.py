@@ -28,10 +28,21 @@ import torchvision.models as models
 
 logger = logging.getLogger("spark.inference")
 
-# External verified paths (outside git repository)
-RESEARCH_MODEL_DIR = r"D:\PS_DATA\PHASE_23_COMBINED_AUGMENTATION\02_TRAINING"
-CHECKPOINT_PATH = r"D:\PS_DATA\PHASE_23_COMBINED_AUGMENTATION\03_CHECKPOINTS\EXP_23_C_best_model.pt"
-RESNET_WEIGHTS_PATH = r"C:\Users\user\.cache\torch\hub\checkpoints\resnet18-f37072fd.pth"
+# Production-portable model path resolution (Linux container & local development compatible)
+_BACKEND_DIR = Path(__file__).resolve().parents[2]
+_PACKAGED_MODEL_PATH = _BACKEND_DIR / "model" / "EXP_23_C_best_model.pt"
+_FALLBACK_RESEARCH_PATH = Path(r"D:\PS_DATA\PHASE_23_COMBINED_AUGMENTATION\03_CHECKPOINTS\EXP_23_C_best_model.pt")
+
+CHECKPOINT_PATH = os.environ.get(
+    "MODEL_PATH",
+    str(_PACKAGED_MODEL_PATH if _PACKAGED_MODEL_PATH.exists() else _FALLBACK_RESEARCH_PATH)
+)
+
+_LOCAL_RESNET_PATH = Path(r"C:\Users\user\.cache\torch\hub\checkpoints\resnet18-f37072fd.pth")
+RESNET_WEIGHTS_PATH = os.environ.get(
+    "RESNET_WEIGHTS_PATH",
+    str(_LOCAL_RESNET_PATH if _LOCAL_RESNET_PATH.exists() else "")
+)
 
 CLASS_NAMES = ["SMASH", "CLEAR", "DROP", "DRIVE", "NET_SHOT"]
 NUM_SAMPLED_FRAMES = 16
@@ -127,12 +138,15 @@ class InferenceManager:
         t0 = time.perf_counter()
 
         # 1. Load ResNet-18 spatial feature extractor
-        if not os.path.exists(RESNET_WEIGHTS_PATH):
-            raise FileNotFoundError(f"ResNet-18 weights not found at {RESNET_WEIGHTS_PATH}")
+        if RESNET_WEIGHTS_PATH and os.path.exists(RESNET_WEIGHTS_PATH):
+            logger.info(f"Loading local ResNet-18 weights from {RESNET_WEIGHTS_PATH}")
+            resnet = models.resnet18(weights=None)
+            state_dict = torch.load(RESNET_WEIGHTS_PATH, map_location="cpu", weights_only=False)
+            resnet.load_state_dict(state_dict)
+        else:
+            logger.info("Loading canonical PyTorch ImageNet ResNet-18 weights...")
+            resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
 
-        resnet = models.resnet18(weights=None)
-        state_dict = torch.load(RESNET_WEIGHTS_PATH, map_location="cpu", weights_only=False)
-        resnet.load_state_dict(state_dict)
         resnet.fc = nn.Identity()  # Truncate at penultimate 512-D pooling layer
         resnet.eval()
         for param in resnet.parameters():
@@ -140,16 +154,13 @@ class InferenceManager:
         self.resnet = resnet
 
         # 2. Load BadmintonTransformerLSTMClassifier temporal model
-        if not os.path.exists(RESEARCH_MODEL_DIR):
-            raise FileNotFoundError(f"Research models directory not found at {RESEARCH_MODEL_DIR}")
         if not os.path.exists(CHECKPOINT_PATH):
             raise FileNotFoundError(f"EXP23_C checkpoint not found at {CHECKPOINT_PATH}")
 
-        if RESEARCH_MODEL_DIR not in sys.path:
-            sys.path.insert(0, RESEARCH_MODEL_DIR)
+        # Import packaged architecture (self-contained, no external research directory needed)
+        from backend.app.models.architecture import BadmintonTransformerLSTMClassifier
 
-        from models import BadmintonTransformerLSTMClassifier
-
+        logger.info(f"Loading EXP_23_C checkpoint from {CHECKPOINT_PATH}...")
         temporal_model = BadmintonTransformerLSTMClassifier()
         ckpt = torch.load(CHECKPOINT_PATH, map_location="cpu", weights_only=False)
         temporal_model.load_state_dict(ckpt["model_state_dict"])

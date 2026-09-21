@@ -35,6 +35,7 @@ cloudflared.exe
 
 # Model Weights, Tensors & Checkpoints (Do NOT commit large ML weights)
 *.pt
+!backend/model/EXP_23_C_best_model.pt
 *.pth
 *.onnx
 *.npy
