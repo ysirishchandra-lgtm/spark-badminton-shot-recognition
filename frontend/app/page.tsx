@@ -1,39 +1,84 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ShotClassBadges from '@/components/ShotClassBadges';
 import VideoUploader from '@/components/VideoUploader';
-import VideoPreview from '@/components/VideoPreview';
+import VideoPlayer from '@/components/VideoPlayer';
+import AnalysisPanel from '@/components/AnalysisPanel';
+import AnalysisPlaceholder from '@/components/AnalysisPlaceholder';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import ArchitectureSection from '@/components/ArchitectureSection';
 import LimitationsSection from '@/components/LimitationsSection';
 import { VideoUploadResponse, VideoAnalysisResponse, AnalysisStatus } from '@/types';
-import { analyzeVideo } from '@/lib/api';
+import { uploadVideoFile, analyzeVideo, transcodeVideo, getVideoStreamUrl } from '@/lib/api';
 
 export default function HomePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<VideoUploadResponse | null>(null);
   const [analysisResult, setAnalysisResult] = useState<VideoAnalysisResponse | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleFileSelected = (file: File | null) => {
+  // Clean up object URL on unmount or URL change
+  useEffect(() => {
+    return () => {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
+  }, [videoUrl]);
+
+  const handleFileSelected = (file: File) => {
+    // Revoke old object URL if present
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+
+    // Create fresh object URL for immediate browser playback
+    const newUrl = URL.createObjectURL(file);
     setSelectedFile(file);
+    setVideoUrl(newUrl);
+    setStatus('selected');
     setUploadResult(null);
     setAnalysisResult(null);
     setErrorMessage(null);
-    setStatus(file ? 'selected' : 'idle');
   };
 
-  const handleUploadSuccess = (response: VideoUploadResponse) => {
-    setUploadResult(response);
-    setStatus('uploaded');
+  const handleClearVideo = () => {
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+    setSelectedFile(null);
+    setVideoUrl(null);
+    setUploadResult(null);
+    setAnalysisResult(null);
+    setStatus('idle');
     setErrorMessage(null);
   };
 
+  const handleFallbackTranscode = async (): Promise<string | null> => {
+    if (!selectedFile) return null;
+    try {
+      let currentUpload = uploadResult;
+      if (!currentUpload) {
+        currentUpload = await uploadVideoFile(selectedFile);
+        setUploadResult(currentUpload);
+      }
+      const transcodeRes = await transcodeVideo(currentUpload.video_id);
+      if (transcodeRes.status === 'ready') {
+        return getVideoStreamUrl(currentUpload.video_id);
+      }
+      return null;
+    } catch (err) {
+      console.warn('Fallback transcode error:', err);
+      return null;
+    }
+  };
+
   const handleAnalyzeClick = async () => {
-    if (!uploadResult?.video_id) {
-      setErrorMessage('Please upload a video before analyzing.');
+    if (!selectedFile) {
+      setErrorMessage('Please select a video before analyzing.');
       return;
     }
 
@@ -41,7 +86,15 @@ export default function HomePage() {
     setErrorMessage(null);
 
     try {
-      const result = await analyzeVideo(uploadResult.video_id);
+      // Step 1: Upload to backend if not already uploaded
+      let currentUpload = uploadResult;
+      if (!currentUpload) {
+        currentUpload = await uploadVideoFile(selectedFile);
+        setUploadResult(currentUpload);
+      }
+
+      // Step 2: Trigger model inference with video_id
+      const result = await analyzeVideo(currentUpload.video_id);
       setAnalysisResult(result);
       setStatus('completed');
     } catch (err: unknown) {
@@ -51,123 +104,132 @@ export default function HomePage() {
     }
   };
 
-  const handleClearVideo = () => {
-    setSelectedFile(null);
-    setUploadResult(null);
-    setAnalysisResult(null);
-    setStatus('idle');
-    setErrorMessage(null);
-  };
-
   const handleDismissError = () => {
     setErrorMessage(null);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-      {/* Hero Section */}
-      <section className="text-center space-y-4 max-w-4xl mx-auto pt-4 pb-2">
+      {/* =========================================================================
+          HERO SECTION: Light Sports-Tech Theme + Deep Graphite Typography
+          ========================================================================= */}
+      <section className="text-center space-y-4 max-w-4xl mx-auto pt-6 pb-2">
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-semibold tracking-wide">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>AI-POWERED BADMINTON SHOT RECOGNITION</span>
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-mono font-semibold tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+            <span>SPARK</span>
           </div>
 
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-xs font-mono">
-            <span>Validation Benchmark: <strong className="text-emerald-600 dark:text-emerald-400">77.55% Acc</strong> • <strong className="text-emerald-600 dark:text-emerald-400">69.35% F1</strong></span>
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-mono">
+            <span>Validation Benchmark: <strong className="text-emerald-700 dark:text-emerald-400">77.55% Acc</strong> • <strong className="text-emerald-700 dark:text-emerald-400">69.35% F1</strong></span>
           </div>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[var(--text-primary)] tracking-tight leading-tight">
-          Professional Badminton{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
-            Stroke Intelligence
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+          AI-POWERED BADMINTON{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
+            SHOT RECOGNITION
           </span>
         </h1>
 
-        <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
-          Deep computer vision and temporal sequence modeling calibrated to recognize competitive stroke mechanics, kinematics, and shot trajectory.
+        <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-300 leading-relaxed max-w-2xl mx-auto">
+          Analyze badminton videos using computer vision and temporal motion analysis.
         </p>
+
+        {/* Action Buttons in Hero */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a
+            href="#analyze"
+            className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm transition-all duration-200 shadow-xs flex items-center space-x-2"
+          >
+            <span>ANALYZE VIDEO</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </a>
+
+          <a
+            href="#architecture"
+            className="px-5 py-2.5 rounded-lg bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-white/10 font-semibold text-xs sm:text-sm transition-all duration-200 shadow-xs"
+          >
+            HOW IT WORKS
+          </a>
+        </div>
       </section>
 
-      {/* Target Classes Taxonomy Badges */}
+      {/* Target Stroke Taxonomy Badges */}
       <ShotClassBadges />
 
-      {/* Main Upload and Preview Grid */}
+      {/* =========================================================================
+          ANALYSIS WORKSPACE SECTION (#analyze): Video Player + Prediction Panel
+          ========================================================================= */}
       <section id="analyze" className="scroll-mt-20 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] pb-4 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] pb-3 gap-2">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-              Match Clip Analysis Studio
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] tracking-tight">
+              VIDEO ANALYSIS STUDIO
             </h2>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Upload an isolated match stroke clip (MP4, AVI, MOV) for automated frame sampling and deep inference.
+              Upload an isolated match stroke clip to activate browser playback and deep temporal sequence classification.
             </p>
           </div>
           <div className="text-xs font-mono text-[var(--text-muted)]">
-            Max 100MB • 16 Chronological Frames
+            HTML5 Native Player • 16 Chronological Frames
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Upload & Actions */}
-          <div className="lg:col-span-5 space-y-6">
-            <VideoUploader
-              selectedFile={selectedFile}
-              onFileSelected={handleFileSelected}
-              onUploadSuccess={handleUploadSuccess}
-              onAnalyzeClick={handleAnalyzeClick}
-              status={status}
-              errorMessage={errorMessage}
-              onDismissError={handleDismissError}
-              videoId={uploadResult?.video_id || null}
-            />
-          </div>
+        {/* STATE 1: No Video Selected -> Show Clean Upload Dropzone */}
+        {!selectedFile || !videoUrl ? (
+          <VideoUploader
+            onFileSelected={handleFileSelected}
+            errorMessage={errorMessage}
+            onDismissError={handleDismissError}
+          />
+        ) : (
+          /* STATE 2, 3, 4, 5: Video Selected / Analyzing / Completed / Error */
+          /* Desktop: Side-by-Side (Video Left, AI Prediction Right) | Mobile: Stacked */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Column (lg:col-span-7): Real HTML5 Video Player */}
+            <div className="lg:col-span-7 space-y-4">
+              <VideoPlayer
+                file={selectedFile}
+                videoUrl={videoUrl}
+                status={status}
+                onClear={handleClearVideo}
+                onAnalyze={handleAnalyzeClick}
+                onFallbackTranscode={handleFallbackTranscode}
+                errorMessage={errorMessage}
+              />
+            </div>
 
-          {/* Right Column: Video Preview or Interactive State */}
-          <div className="lg:col-span-7 space-y-6">
-            {selectedFile ? (
-              <VideoPreview file={selectedFile} onClear={handleClearVideo} />
-            ) : (
-              <div className="w-full spark-card border-dashed rounded-2xl p-10 text-center flex flex-col items-center justify-center min-h-[340px]">
-                <div className="w-16 h-16 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] mb-4 shadow-sm">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h4 className="text-base font-semibold text-[var(--text-primary)]">
-                  Video Player Preview Active Upon Upload
-                </h4>
-                <p className="text-xs text-[var(--text-secondary)] mt-2 max-w-sm">
-                  Select a video file to verify playback, inspect duration and dimensions, and initiate automated frame extraction.
-                </p>
-              </div>
-            )}
+            {/* Right Column (lg:col-span-5): Prediction Panel or Placeholder Workspace */}
+            <div className="lg:col-span-5 space-y-4">
+              {status === 'completed' && analysisResult ? (
+                <AnalysisPanel
+                  analysisResult={analysisResult}
+                  status={status}
+                />
+              ) : (
+                <AnalysisPlaceholder
+                  status={status}
+                  onAnalyze={handleAnalyzeClick}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
-      {/* Results Section */}
-      <section id="results" className="scroll-mt-20">
-        <ResultsDisplay
-          videoId={uploadResult?.video_id || null}
-          uploadedFilename={uploadResult?.filename || null}
-          status={status}
-          analysisResult={analysisResult}
-          errorMessage={errorMessage}
-        />
-      </section>
+      {/* Sports Analytics Results (KPI Cards + Stepper) */}
+      {status === 'completed' && analysisResult && (
+        <section id="results" className="scroll-mt-20">
+          <ResultsDisplay
+            status={status}
+            analysisResult={analysisResult}
+            errorMessage={errorMessage}
+          />
+        </section>
+      )}
 
       {/* Technical Architecture Section */}
       <ArchitectureSection />

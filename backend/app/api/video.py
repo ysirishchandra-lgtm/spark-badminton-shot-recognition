@@ -1,10 +1,11 @@
-"""Video upload, analysis, and processing endpoints."""
+"""Video upload, analysis, streaming, and transcoding endpoints."""
 
 import os
 import glob
 import logging
 from pathlib import Path
 from fastapi import APIRouter, File, UploadFile, HTTPException, status
+from fastapi.responses import FileResponse
 
 from backend.app.core.config import settings
 from backend.app.schemas.video import (
@@ -14,6 +15,7 @@ from backend.app.schemas.video import (
 )
 from backend.app.utils.security import sanitize_filename, validate_video_file, generate_video_id
 from backend.app.services.inference_service import analyze_video
+from backend.app.services.transcode_service import inspect_video_codec, transcode_to_h264
 
 logger = logging.getLogger("spark.api.video")
 
@@ -35,8 +37,11 @@ def resolve_video_path(video_id: str) -> Path:
             detail="Invalid video ID provided."
         )
 
-    # Search for files starting with {clean_id}_
-    candidates = list(settings.UPLOAD_DIR.glob(f"{clean_id}_*"))
+    # Search for files starting with {clean_id}_ (ignoring transcoded _h264 for raw resolution)
+    candidates = [
+        f for f in settings.UPLOAD_DIR.glob(f"{clean_id}_*")
+        if not f.name.endswith("_h264.mp4")
+    ]
     if not candidates:
         # Check exact ID with extension
         candidates = list(settings.UPLOAD_DIR.glob(f"{clean_id}.*"))
@@ -126,6 +131,80 @@ async def upload_video(file: UploadFile = File(...)):
         size_bytes=total_bytes,
         message="Video uploaded successfully and ready for analysis."
     )
+
+
+@router.get(
+    "/stream/{video_id}",
+    summary="Stream video for browser playback",
+    description="Streams the video with byte-range support. Serves transcoded H.264 version if present."
+)
+async def stream_video(video_id: str):
+    """Streams the requested video file with proper MIME headers."""
+    clean_id = sanitize_filename(video_id).strip()
+    
+    # 1. Prefer transcoded H.264 file if present
+    transcoded_path = settings.UPLOAD_DIR / f"{clean_id}_h264.mp4"
+    if transcoded_path.exists() and transcoded_path.is_file():
+        return FileResponse(
+            transcoded_path,
+            media_type="video/mp4",
+            filename=f"{clean_id}_h264.mp4"
+        )
+
+    # 2. Otherwise serve original uploaded video
+    target_path = resolve_video_path(clean_id)
+    return FileResponse(
+        target_path,
+        media_type="video/mp4",
+        filename=target_path.name
+    )
+
+
+@router.post(
+    "/transcode/{video_id}",
+    summary="Transcode video to browser-compatible H.264 MP4",
+    description="Converts unsupported MP4 codecs (e.g. FMP4/mp4v) to standard H.264 using hardware MSMF encoding."
+)
+async def transcode_video_endpoint(video_id: str):
+    clean_id = sanitize_filename(video_id).strip()
+    target_path = resolve_video_path(clean_id)
+    transcoded_path = settings.UPLOAD_DIR / f"{clean_id}_h264.mp4"
+
+    # Already transcoded
+    if transcoded_path.exists() and transcoded_path.stat().st_size > 0:
+        return {
+            "status": "ready",
+            "video_id": clean_id,
+            "stream_url": f"{settings.API_V1_PREFIX}/video/stream/{clean_id}",
+            "message": "Transcoded video is ready for playback."
+        }
+
+    # Inspect codec
+    is_compatible, codec_name = inspect_video_codec(target_path)
+    if is_compatible:
+        # File is already browser-compatible
+        return {
+            "status": "ready",
+            "video_id": clean_id,
+            "stream_url": f"{settings.API_V1_PREFIX}/video/stream/{clean_id}",
+            "message": "Video codec is already browser-compatible."
+        }
+
+    # Execute safe transcode to H.264
+    success = transcode_to_h264(target_path, transcoded_path)
+    if success:
+        return {
+            "status": "ready",
+            "video_id": clean_id,
+            "stream_url": f"{settings.API_V1_PREFIX}/video/stream/{clean_id}",
+            "message": "Video successfully transcoded to browser-compatible H.264 MP4."
+        }
+    else:
+        return {
+            "status": "unavailable",
+            "video_id": clean_id,
+            "message": f"Transcoding unavailable for codec '{codec_name}'. Video remains accepted for AI analysis."
+        }
 
 
 @router.post(

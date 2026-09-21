@@ -69,6 +69,36 @@ export async function uploadVideoFile(file: File): Promise<VideoUploadResponse> 
 }
 
 /**
+ * Returns stream URL for a video_id.
+ */
+export function getVideoStreamUrl(videoId: string): string {
+  return `${API_BASE_URL}/api/video/stream/${videoId}`;
+}
+
+/**
+ * Requests backend automatic transcoding of unsupported codecs to H.264 MP4.
+ */
+export async function transcodeVideo(videoId: string): Promise<{ status: string; stream_url?: string; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/video/transcode/${videoId}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Transcoding request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Transcoding request failed';
+    throw new Error(message);
+  }
+}
+
+/**
  * Sends a video_id to POST /api/video/analyze to run inference.
  */
 export async function analyzeVideo(videoId: string): Promise<VideoAnalysisResponse> {
